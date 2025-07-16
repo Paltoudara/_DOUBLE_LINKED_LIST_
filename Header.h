@@ -13,7 +13,10 @@ _PANAGIOTIS_BEGIN
 template<typename _Ty>
 class double_linked_list final {
 private:
-	//list_node
+	//list_node,has three constructors
+	//one default,one for copies of data and one for moving data with clear
+	//specifiations the private constructor is used in order to craft data in place
+	//calling its constructor  and a craft func to use only with this private constructor
 	class list_node final {
 	private:
 		class secretClass {};
@@ -27,6 +30,7 @@ private:
 				"the type must be constructible in place with these args");
 		}
 	public:
+		//data members of every list_node 
 		_Ty data;
 		list_node* next;
 		list_node* prev;
@@ -48,9 +52,9 @@ private:
 			static_assert(std::is_move_constructible_v<_Ty>, "the type must be "
 				"move constructible in order to use this function");
 		}
+		//static func no need to make it non static
 		template<class ..._Valty>
 		static list_node* craft(_Valty&& ..._Val) {
-
 			list_node* ptr = new list_node{ secretClass{},std::forward<_Valty>(_Val)... };
 			return ptr;
 
@@ -687,87 +691,87 @@ private:
 			ptr = nullptr;
 		}
 	};
-	//
+	//start func done//
 	list_node_iterator start()const noexcept {
 		//start of the list 
 		return head;
 	}
-	//start func done 
+	//start func done//
 	list_node_iterator start()noexcept {
 		//start of the list 
 		return head;
 	}
-	//finish func done 
+	//finish func done// 
 	list_node_iterator finish()noexcept {
 		//end of the list
 		return nullptr;
 	}
-	//finish func done 
+	//finish func done// 
 	list_node_iterator finish()const noexcept {
 		//end of the list 
 		return nullptr;
 	}
-	//cstart func done 
+	//cstart func done// 
 	list_node_const_iterator cstart()const noexcept {
 		//start of the list 
 		return head;
 	}
-	//cstart func done 
+	//cstart func done// 
 	list_node_const_iterator cstart()noexcept {
 		//start of the list 
 		return head;
 	}
-	//cfinish func done 
+	//cfinish func done// 
 	list_node_const_iterator cfinish()noexcept {
 		//end of the list
 		return nullptr;
 	}
-	//cfinish func done 
+	//cfinish func done// 
 	list_node_const_iterator cfinish()const noexcept {
 		//end of the list 
 		return nullptr;
 	}
-	//rstart func done 
+	//rstart func done// 
 	list_node_reverse_iterator rstart()const noexcept {
-		//start of the list 
+		//end of the list 
 		return tail;
 	}
-	//rstart func done 
+	//rstart func done// 
 	list_node_reverse_iterator rstart()noexcept {
-		//start of the list 
+		//end of the list 
 		return tail;
 	}
-	//rfinish func done 
+	//rfinish func done//
 	list_node_reverse_iterator rfinish()noexcept {
-		//end of the list
+		//end of the list from backwards prespective
 		return nullptr;
 	}
-	//cfinish func done 
+	//rfinish func done// 
 	list_node_reverse_iterator rfinish()const noexcept {
-		//end of the list 
+		//end of the list from backwards prespective 
 		return nullptr;
 	}
-	//crstart func done 
+	//crstart func done// 
 	list_node_const_reverse_iterator crstart()const noexcept {
-		//start of the list 
-		return tail;
-	}
-	//crstart func done 
-	list_node_const_reverse_iterator crstart()noexcept {
-		//start of the list 
-		return tail;
-	}
-	//crfinish func done 
-	list_node_const_reverse_iterator crfinish()noexcept {
-		//end of the list
-		return nullptr;
-	}
-	//crfinish func done 
-	list_node_const_reverse_iterator crfinish()const noexcept {
 		//end of the list 
+		return tail;
+	}
+	//crstart func done// 
+	list_node_const_reverse_iterator crstart()noexcept {
+		//end of the list 
+		return tail;
+	}
+	//crfinish func done// 
+	list_node_const_reverse_iterator crfinish()noexcept {
+		//end of the list from backwards prespective
 		return nullptr;
 	}
-	//private members
+	//crfinish func done// 
+	list_node_const_reverse_iterator crfinish()const noexcept {
+		//end of the list from backwards prespective 
+		return nullptr;
+	}
+	//private members:
 	list_node* head;
 	list_node* tail;
 	std::size_t count;
@@ -948,88 +952,110 @@ private:
 		}
 		return false;
 	}
-	//insert_element func 
-	bool insert_element(const _Ty& data) {
-		//pretty much we consider that the list is sorted 
-		//in ascending order and we insert the element based on the order 
-		//we use the curr,prev method to find the position that we must insert the 
-		//element 
-		list_node* ptr{ new(std::nothrow)list_node(data) };
-		if (ptr == nullptr)return false;
-		list_node* prev{ nullptr };
-		list_node* curr{ head };
-		count++;
-		while (curr != nullptr && curr->data < data) {
-			prev = curr;
-			curr = curr->next;
+	//insert_func done// 
+	bool insert(list_node_const_iterator pos, const _Ty& data) {
+		//this is an insert function
+		//there are three scenarios
+		//1) the other doesn't give a valid position so don't do anything
+		//2) we are empty so push_back
+		//3) we create the node and we insert it to the list 
+		if (pos == cend()) {//no valid pos no insertion
+			return false;
 		}
-		//and after this we check  conditions to determing if the element must
-		//be placed at the start of list at the end or somewhere in the middle
-		//note that the list might be empty 
-		ptr->prev = prev;
-		ptr->next =curr;
-		if (prev != nullptr)
-		{
-			
-			prev->next = ptr;
+		if (empty()) {
+			if (push_back(data))return true;
+			else return false;
 		}
-		else
-		{
-			
-			head = ptr;
-		}	
-		if (curr != nullptr) {
-			curr->prev = ptr;
-		}
-		else {
-			tail = ptr;
-		}
-		return true;
-	}
-	//add_unique_element fund done 
-	bool add_unique_element(const _Ty& data) {
-		//the add_unique_element func does exactly the same thing as insert_element
-		//does ,the only difference is that it searches also if the element already 
-		//exists withing the list, if it does we do not add it
+		//if (pos == cbegin()) {
+		//	if (count == 1) {
+		//		if (push_back(data))return true;//tail
+		//		else return false;
+		//	}
+		//	else {
+		//		list_node* ptr{ new (std::nothrow)list_node{data} };
+		//		if (ptr == nullptr)return false;
+		//		ptr->next = pos.ptr->next;
+		//		pos.ptr->next->prev = ptr;
+		//		pos.ptr->next = ptr;
+		//		ptr->prev = pos.ptr;
+		//		return true;
+		//	}
+		//}
+		//if (pos != cbegin()) {
+		//	list_node* ptr{ new (std::nothrow)list_node{data} };
+		//	if (ptr == nullptr)return false;
+		//	ptr->next = pos.ptr->next;
+		//	if (pos.ptr->next != nullptr) {
+		//		pos.ptr->next->prev = ptr;
+		//	}
+		//	else {
+		//		tail = ptr;
+		//	}
+		//	pos.ptr->next = ptr;
+		//	ptr->prev = pos.ptr;
+		//	return true;
+		//}
 		list_node* ptr{ new (std::nothrow)list_node{data} };
 		if (ptr == nullptr)return false;
-		list_node* prev{ nullptr };
-		list_node* curr{ head };
-		while (curr != nullptr && curr->data < data) {
-			prev = curr;
-			curr = curr->next;
-		}
-		list_node* ptr1{ curr };
-		while (ptr1 != nullptr) {
-			if (ptr1->data == data)return false;
-			ptr1 = ptr1->next;
-		}
-		//and after this we check  conditions to determing if the element must
-		//be placed at the start of list at the end or somewhere in the middle
-		//note that the list might be empty 
+		//we insert the node after the position simple
+		//doesn't matter where the pos is we insert it either somewhere in the middle
+		//or at the end no difference this code handles both scenarios
+		//if we are in middle we make the first if no need to change tail
+		//if we are at the end we change tail simply 
 		count++;
-		ptr->prev = prev;
-		ptr->next = curr;
-		if (prev != nullptr)
-		{
-
-			prev->next = ptr;
-		}
-		else
-		{
-
-			head = ptr;
-		}
-		if (curr != nullptr) {
-			curr->prev = ptr;
+		ptr->next = pos.ptr->next;
+		if (pos.ptr->next != nullptr) {
+			pos.ptr->next->prev = ptr;
 		}
 		else {
 			tail = ptr;
 		}
+		pos.ptr->next = ptr;
+		ptr->prev = pos.ptr;
 		return true;
-
 	}
-	//erase_node_if func done 
+	//add_unique func done//
+	template<typename _Pred1>
+	bool add_unique(list_node_const_iterator pos, const _Ty& data,_Pred1 _Pred) {
+		//this function pretty much uses the same tactic as the insert function above
+		//the only difference is that we check if the element is in the list 
+		//if it is not then we insert it
+		//this function takes a _Pred arg with default value std::equal_to<>{}
+		// that is used in order to compare
+		//this _Pred must be a func that can be called with two const _Ty& args 
+		//and the return type must be bool else the behavior is undefined
+		if (pos == cend()) {//no valid pos no insertion
+			return false;
+		}
+		if (empty()) {
+			if (push_back(data))return true;
+			else return false;
+		}
+		list_node* curr{ head };
+		while (curr != nullptr) {
+			if (_Pred(std::as_const(curr->data),std::as_const(data)))return false;
+			curr = curr->next;
+		}
+		list_node* ptr{ new (std::nothrow)list_node{data} };
+		if (ptr == nullptr)return false;
+		//we insert the node after the position simple
+		//doesn't matter where the pos is we insert it either somewhere in the middle
+		//or at the end no difference this code handles both scenarios
+		//if we are in middle we make the first if no need to change tail
+		//if we are at the end we change tail simply 
+		count++;
+		ptr->next = pos.ptr->next;
+		if (pos.ptr->next != nullptr) {
+			pos.ptr->next->prev = ptr;
+		}
+		else {
+			tail = ptr;
+		}
+		pos.ptr->next = ptr;
+		ptr->prev = pos.ptr;
+		return true;
+	}
+	//erase_node_if func done// 
 	template<typename _Pred1>
 	void erase_node_if(_Pred1 _Pred) {
 		//this func in simple terms deletes an element from a list
@@ -1073,7 +1099,7 @@ private:
 			tail = prev;
 		}
 	}
-	//delete_duplicates func done
+	//delete_duplicates func done//
 	template<typename _Pred1>
 	void delete_duplicates(_Pred1 _Pred) {
 		//this func simply does two things
@@ -1115,7 +1141,7 @@ private:
 		//because curr will be nullptr 
 		return;
 	}
-	//is_ascending_ func done
+	//is_ascending_ func done//
 	template<typename Compare>
 	bool is_ascending_(Compare comp)const {
 		//this is a func that takes a comparator in order to compare the elements
@@ -1134,7 +1160,7 @@ private:
 		if (curr != nullptr)return false;//we are not at the end so not in ascending order
 		return true;
 	}
-	//is_descending_ func done 
+	//is_descending_ func done// 
 	template<typename Compare>
 	bool is_descending_(Compare comp)const {
 		//this is a func that takes a comparator in order to compare the elements
@@ -1177,7 +1203,7 @@ private:
 		}
 		return asc || desc;
 	}
-	//merge_lists func done
+	//merge_lists func done//
 	template<typename Compare>
 	void merge_lists(double_linked_list<_Ty>& other, Compare comp) {
 		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be destructible without throwing");
@@ -1263,9 +1289,12 @@ public:
 	//
 	bool push_back(_Ty&& data);
 	//
-	bool insert(const _Ty& data);
+	bool insert_after(const_iterator pos,const _Ty& data);
 	//
-	bool add_unique(const _Ty& data);
+	bool add_unique_after(const_iterator pos, const _Ty& data);
+	//
+	template<typename _Pred1>
+	bool add_unique_after(const_iterator pos,const _Ty& data,_Pred1 _Pred);
 	//
 	bool push_front(const _Ty& data);
 	//
@@ -1396,98 +1425,87 @@ public:
 		return std::move(head->data);
 
 	}
-	//begin func done 
+	//begin func done// 
 	iterator begin()const noexcept {
-
 		return start();
 	}
-	//begin func done 
+	//begin func done// 
 	iterator begin()noexcept {
-
 		return start();
 	}
-	//end func done 
+	//end func done// 
 	iterator end()const noexcept {
-
 		return finish();
 	}
-	//end func done 
+	//end func done// 
 	iterator end() noexcept {
 		return finish();
 	}
-	//begin func done 
+	//begin func done //
 	const_iterator cbegin()const noexcept {
-
 		return cstart();
 	}
-	//begin func done 
+	//begin func done// 
 	const_iterator cbegin()noexcept {
-
 		return cstart();
 	}
-	//end func done 
+	//end func done// 
 	const_iterator cend()const noexcept {
-
 		return cfinish();
 	}
-	//end func done 
+	//end func done// 
 	const_iterator cend() noexcept {
 		return cfinish();
 	}
-	//rbegin func done 
+	//rbegin func done// 
 	reverse_iterator rbegin()noexcept {
-
 		return rstart();
 	}
-	//rbegin func done 
+	//rbegin func done// 
 	reverse_iterator rbegin()const noexcept {
-
 		return rstart();
 	}
-	//rend func done 
+	//rend func done// 
 	reverse_iterator rend()const noexcept {
-
 		return rfinish();
 	}
-	//rend func done 
+	//rend func done// 
 	reverse_iterator rend() noexcept {
 		return rfinish();
 	}
-	//crbegin func done 
+	//crbegin func done// 
 	const_reverse_iterator crbegin()noexcept {
-
 		return crstart();
 	}
-	//crbegin func done 
+	//crbegin func done// 
 	const_reverse_iterator crbegin()const noexcept {
-
 		return crstart();
 	}
-	//crend func done 
+	//crend func done// 
 	const_reverse_iterator crend()const noexcept {
-
 		return crfinish();
 	}
-	//crend func done 
+	//crend func done// 
 	const_reverse_iterator crend() noexcept {
 		return crfinish();
 	}
 };
-//default constructor done
+//default constructor done//
 template<typename _Ty>
-double_linked_list<_Ty>::double_linked_list()noexcept :head{}, tail{}, count{}
+double_linked_list<_Ty>::double_linked_list()noexcept 
+	:head{}, tail{}, count{}
 { }
-//push_back func done
+//push_back func done//
 template<typename _Ty>
 bool double_linked_list<_Ty>::push_back(const _Ty& data) {
 	return push_back_node(data);
 }
-//push_back func done
+//push_back func done//
 template<typename _Ty>
 bool double_linked_list<_Ty>::push_back(_Ty&& data) {
 	return push_back_node(std::move(data));
 }
-//show func done
+//show func done//
 template<typename _Ty>
 void double_linked_list<_Ty>::show()const {
 	list_node* ptr{ head };
@@ -1504,37 +1522,37 @@ void double_linked_list<_Ty>::show()const {
 	std::cout << "\n\n";
 	return;
 }
-//push_front func done
+//push_front func done//
 template<typename _Ty>
 bool double_linked_list<_Ty>::push_front(const _Ty& data) {
 	return push_front_node(data);
 }
-//push_front func done 
+//push_front func done// 
 template<typename _Ty>
 bool double_linked_list<_Ty>::push_front(_Ty&& data) {
 	return push_front_node(std::move(data));
 }
-//pop_front func done
+//pop_front func done//
 template<typename _Ty>
 void double_linked_list<_Ty>::pop_front() {
 	pop_front_node();
 }
-//pop_back func done
+//pop_back func done//
 template<typename _Ty>
 void double_linked_list<_Ty>::pop_back() {
 	pop_back_node();
 }
-//destructor func done 
+//destructor func done// 
 template<typename _Ty>
 double_linked_list<_Ty>::~double_linked_list()noexcept {
 	clear();
 }
-//reverse func done
+//reverse func done//
 template<typename _Ty>
 void double_linked_list<_Ty>::reverse()noexcept {
 	reverse_double_linked_list();
 }
-//swap func done
+//swap func done//
 template<typename _Ty>
 void double_linked_list<_Ty>::swap(double_linked_list<_Ty>& other)noexcept {
 	//this justs swaps the contents of two double linked lists
@@ -1546,7 +1564,7 @@ void double_linked_list<_Ty>::swap(double_linked_list<_Ty>& other)noexcept {
 		std::swap(count, other.count);
 	}
 }
-//constructor with initializer_list done 
+//constructor with initializer_list done//
 template<typename _Ty>
 double_linked_list<_Ty>::double_linked_list(const std::initializer_list<_Ty>& other)
 	:head{}, tail{}, count{}
@@ -1561,7 +1579,7 @@ double_linked_list<_Ty>::double_linked_list(const std::initializer_list<_Ty>& ot
 	}
 
 }
-//copy constructor done 
+//copy constructor done// 
 template<typename _Ty>
 double_linked_list<_Ty>::double_linked_list(const double_linked_list<_Ty>& other)
 	:head{}, tail{}, count{}
@@ -1578,7 +1596,7 @@ double_linked_list<_Ty>::double_linked_list(const double_linked_list<_Ty>& other
 		curr = curr->next;
 	}
 }
-//
+//move constructor done//
 template<typename _Ty>
 double_linked_list<_Ty>::double_linked_list(double_linked_list<_Ty>&&other)noexcept
 	:head{}, tail{}, count{}
@@ -1590,19 +1608,19 @@ double_linked_list<_Ty>::double_linked_list(double_linked_list<_Ty>&&other)noexc
 	std::swap(tail, other.tail);
 	std::swap(count, other.count);
 }
-//emplace_back func done 
+//emplace_back func done// 
 template<typename _Ty>
 template<class..._Valty>
 bool double_linked_list<_Ty>::emplace_back(_Valty&&..._Val) {
 	return emplace_back_node(std::forward<_Valty>(_Val)...);
 }
-//emplace_front func done 
+//emplace_front func done// 
 template<typename _Ty>
 template<class..._Valty>
 bool double_linked_list<_Ty>::emplace_front(_Valty&&..._Val) {
 	return emplace_front_node(std::forward<_Valty>(_Val)...);
 }
-//move operator done
+//move operator done//
 template<typename _Ty>
 double_linked_list<_Ty>& double_linked_list<_Ty>::operator =(double_linked_list<_Ty>&& other)&noexcept
 {
@@ -1614,72 +1632,79 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator =(double_linked_list<
 	std::swap(count, other.count);
 	return *this;
 }
-//insert func done 
+//insert func done// 
 template<typename _Ty>
-bool double_linked_list<_Ty>::insert(const _Ty& data) {
-	return insert_element(data);
+bool double_linked_list<_Ty>::insert_after(const_iterator pos,const _Ty& data) {
+	return insert(pos, data);
 }
-//
+//add_unique_after done//
 template<typename _Ty>
-bool double_linked_list<_Ty>::add_unique(const _Ty& data) {
-	return add_unique_element(data);
+bool double_linked_list<_Ty>::add_unique_after(const_iterator pos,const _Ty& data) {
+	return add_unique(pos, data, std::equal_to<>{});
 }
-//remove func done
+//add_unique_after done//
+template<typename _Ty>
+template<typename _Pred1>
+bool double_linked_list<_Ty>::add_unique_after(const_iterator pos, const _Ty& data,
+	_Pred1 _Pred) {
+	return add_unique(pos, data,_Pred);
+}
+//remove func done//
 template<typename _Ty>
 void double_linked_list<_Ty>::remove(const _Ty& data) {
 	erase_node_if([&](const _Ty& _Other) -> bool { return _Other == data; });
 }
-//remove_if func done
+//remove_if func done//
 template<typename _Ty>
 template<typename _Pred1>
 void double_linked_list<_Ty>::remove_if(_Pred1 _Pred) {
 	erase_node_if(_Pred);
 }
-//unique func done
+//unique func done//
 template<typename _Ty>
 void double_linked_list<_Ty>::unique() {
 	delete_duplicates(std::equal_to<>{});
 }
-//unique func done 
+//unique func done//
 template<typename _Ty>
 template<typename _Pred1>
 void double_linked_list<_Ty>::unique(_Pred1 _Pred) {
 	delete_duplicates(_Pred);
 }
-//is_ascending func done
+//is_ascending func done//
 template<typename _Ty>
 bool double_linked_list<_Ty>::is_ascending()const {
 	return is_ascending_(std::less_equal<>{});
 }
-//is_ascending func done 
+//is_ascending func done// 
 template<typename _Ty>
 template<typename Compare>
 bool double_linked_list<_Ty>::is_ascending(Compare comp)const {
 	return is_ascending_(comp);
 }
-//is_descending func done 
+//is_descending func done// 
 template<typename _Ty>
 bool double_linked_list<_Ty>::is_descending()const {
 	return is_descending_(std::greater_equal<>{});
 }
-//is_descending func done 
+//is_descending func done//
 template<typename _Ty>
 template<typename Compare>
 bool double_linked_list<_Ty>::is_descending(Compare comp)const {
 	return is_descending_(comp);
 }
-//is_sorted func done 
+//is_sorted func done// 
 template<typename _Ty>
 bool double_linked_list<_Ty>::is_sorted()const {
 	return is_sorted_(std::less_equal<>{}, std::greater_equal<>{});
 }
-//is_sorted func done 
+//is_sorted func done// 
 template<typename _Ty>
 template<typename Compare1, typename Compare2>
 bool double_linked_list<_Ty>::is_sorted(Compare1 comp1, Compare2 comp2)const {
 	return is_sorted_(comp1, comp2);
 }
-//copy operator with initializer list func done 
+//copy operator with initializer list func done// 
 template<typename _Ty>
 double_linked_list<_Ty>& double_linked_list<_Ty>::
 operator=(const std::initializer_list<_Ty>& other)& {
@@ -1738,7 +1763,7 @@ operator=(const std::initializer_list<_Ty>& other)& {
 	}
 	return *this;
 }
-//copy operator func done 
+//copy operator func done// 
 template<typename _Ty>
 double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 	double_linked_list<_Ty>& other)& {
@@ -1756,6 +1781,9 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 	//and curr2==nullptr show we go in the last if 
 	//if size<other.size we have to allocate some new nodes so
 	//curr1==nullptr and curr2!=nullptr show we go to the first if 
+	static_assert(std::is_copy_assignable_v<_Ty>, "you must be able to make this operation"
+		"curr1->data=curr2->data");
+	static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be destructible without throwing");
 	if (this != &other) {
 		list_node* prev1{ nullptr };
 		list_node* curr1{ head };
@@ -1796,25 +1824,24 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 	}
 	return *this;
 }
-//
-//merge func done 
+//merge func done// 
 template<typename _Ty>
 template<typename Compare>
 void double_linked_list<_Ty>::merge(double_linked_list<_Ty>& other, Compare comp) {
 	merge_lists(other, comp);
 }
-//merge func done 
+//merge func done// 
 template<typename _Ty>
 template<typename Compare>
 void double_linked_list<_Ty>::merge(double_linked_list<_Ty>&& other, Compare comp) {
 	merge_lists(other, comp);
 }
-//merge func done 
+//merge func done// 
 template<typename _Ty>
 void double_linked_list<_Ty>::merge(double_linked_list<_Ty>& other) {
 	merge_lists(other, std::less_equal<>{});
 }
-//merge func done
+//merge func done//
 template<typename _Ty>
 void double_linked_list<_Ty>::merge(double_linked_list<_Ty>&& other) {
 	merge_lists(other, std::less_equal<>{});
