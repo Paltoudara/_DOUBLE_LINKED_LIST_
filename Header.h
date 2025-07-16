@@ -1632,7 +1632,7 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator =(double_linked_list<
 	std::swap(count, other.count);
 	return *this;
 }
-//insert func done// 
+//insert_after func done// 
 template<typename _Ty>
 bool double_linked_list<_Ty>::insert_after(const_iterator pos,const _Ty& data) {
 	return insert(pos, data);
