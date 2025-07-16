@@ -952,7 +952,7 @@ private:
 		}
 		return false;
 	}
-	//insert_func done// 
+	//insert func done// 
 	bool insert(list_node_const_iterator pos, const _Ty& data) {
 		//this is an insert function
 		//there are three scenarios
