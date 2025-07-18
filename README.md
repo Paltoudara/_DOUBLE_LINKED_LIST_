@@ -7,7 +7,7 @@
 ~with const element</br>
 ~with move element</br>
 ~and a private constructor used to craft the object in place (see implementation)
-2. an inside class of a simple iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),
+1️⃣ an inside class of a simple iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),
    with the iterator you have access to change the element or to see it and advance or go backwards
    operations supported: ++,!=,==,*,+=,->,+,--,-,-= and a couple of constructors and adestructor and acopy operator and a move operator
 3. another inside class of a simple const iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),this kind of iterator works pretty similar to the iterator that we talked above the only difference is
