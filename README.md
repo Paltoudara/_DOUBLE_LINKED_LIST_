@@ -1,6 +1,6 @@
 # _DOUBLE_LINKED_LIST_
 # Simple DOUBLE LINKED LSIT header that i created using C++
-AN entire _DOUBLE_LINKED_LIST_ with all the basic features:
+🧱 AN entire _DOUBLE_LINKED_LIST_ with all the basic features:
 </br>
 1. an inside class of a simple list node that has pointers to previous and next with constructors<br>
 ~the default </br>
