@@ -36,4 +36,4 @@
     and also we must not try to merge a list into itselft simple enough
 # 👥CONTRIBUTORS:
 
-~The-Mastermind1
+🎨~The-Mastermind1
