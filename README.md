@@ -34,7 +34,7 @@
 23. 2️⃣3️⃣merge_lists just combines two lists and leaves the other empty,in order for this func to work properly we consider that the two lists are sorted in ascending order and the other list is not empty else whats the point
     and also we must not try to merge a list into itselft simple enough
 </br>
-IF YOU HAVE ANY ISSEUES ON THIS PLZ FEEL FREE TO SUBMIT THEM 💡
+# 📬IF YOU HAVE ANY ISSEUES ON THIS PLZ FEEL FREE TO SUBMIT THEM 📬
 
     
 # 👥CONTRIBUTORS:
