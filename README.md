@@ -7,13 +7,12 @@
 ~with const element</br>
 ~with move element</br>
 ~and a private constructor used to craft the object in place (see implementation)
-2. an inside class of a simple iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),
+2. 2️⃣an inside class of a simple iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),
    with the iterator you have access to change the element or to see it and advance or go backwards
    operations supported: ++,!=,==,*,+=,->,+,--,-,-= and a couple of constructors and adestructor and acopy operator and a move operator
-3. another inside class of a simple const iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),this kind of iterator works pretty similar to the iterator that we talked above the only difference is
+3. 3️⃣another inside class of a simple const iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),this kind of iterator works pretty similar to the iterator that we talked above the only difference is
    that this iterator is only used to see elements not to change them
-4. another inside class of a simple reverse iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),this kind of iterator again is similar to the iterators talked above but this time the operations that
-   are for advance make the iterator go backwards and the operations to go backwards this time make you go forward like : ++,+=,+ make you go backward in the list, and --,-=,- make you go forward in the list
+4. 4️⃣another inside class of a simple reverse iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),this kind of iterator again is similar to the iterators talked above but this time the operations      that are for advance make the iterator go backwards and the operations to go backwards this time make you go forward like : ++,+=,+ make you go backward in the list, and --,-=,- make you go forward in the list
 5. another inside class of a simple const reverse iterator the differences with this and the reverse iterator is that now we can only see elements not change them
 6. the private funcs start,finish,cstart,cfinish,rstart,rfinish,crstart,crfinish,
 7. the private members head,tail,count in order to maintain and manipulate the list
