@@ -956,45 +956,24 @@ private:
 	bool insert(list_node_const_iterator pos, const _Ty& data) {
 		//this is an insert function
 		//there are three scenarios
-		//1) the other doesn't give a valid position so don't do anything
-		//2) we are empty so push_back
-		//3) we create the node and we insert it to the list 
+		//pos==cend() or point to an empty list
+		//so don't do anything
+		// 1)pos points to a node of other list or a deallocated node so the func throws
+		//2)pos points to our list in that case we insert the element successfuly
 		if (pos == cend()) {//no valid pos no insertion
 			return false;
 		}
-		if (empty()) {
-			if (push_back(data))return true;
-			else return false;
+		list_node* curr{ head };
+		bool is_valid = false;
+		while (curr != nullptr) {
+			if (curr == pos.ptr)is_valid = true;//we see if the pos.ptr address is the same
+			//with the nodes of our list if it is not then it is not a valid pos 
+			curr = curr->next;
 		}
-		//if (pos == cbegin()) {
-		//	if (count == 1) {
-		//		if (push_back(data))return true;//tail
-		//		else return false;
-		//	}
-		//	else {
-		//		list_node* ptr{ new (std::nothrow)list_node{data} };
-		//		if (ptr == nullptr)return false;
-		//		ptr->next = pos.ptr->next;
-		//		pos.ptr->next->prev = ptr;
-		//		pos.ptr->next = ptr;
-		//		ptr->prev = pos.ptr;
-		//		return true;
-		//	}
-		//}
-		//if (pos != cbegin()) {
-		//	list_node* ptr{ new (std::nothrow)list_node{data} };
-		//	if (ptr == nullptr)return false;
-		//	ptr->next = pos.ptr->next;
-		//	if (pos.ptr->next != nullptr) {
-		//		pos.ptr->next->prev = ptr;
-		//	}
-		//	else {
-		//		tail = ptr;
-		//	}
-		//	pos.ptr->next = ptr;
-		//	ptr->prev = pos.ptr;
-		//	return true;
-		//}
+		if (!is_valid) {
+			throw not_a_valid_position{ "tried to insert element at an invalid"
+								"position" };
+		}
 		list_node* ptr{ new (std::nothrow)list_node{data} };
 		if (ptr == nullptr)return false;
 		//we insert the node after the position simple
@@ -1027,13 +1006,20 @@ private:
 		if (pos == cend()) {//no valid pos no insertion
 			return false;
 		}
-		if (empty()) {
-			if (push_back(data))return true;
-			else return false;
-		}
 		list_node* curr{ head };
+		bool  is_valid = false;
 		while (curr != nullptr) {
-			if (_Pred(std::as_const(curr->data),std::as_const(data)))return false;
+			if (curr == pos.ptr)is_valid = true;//we see if the pos.ptr address is the same
+			//with the nodes of our list if it is not then it is not a valid pos 
+			curr = curr->next;
+		}
+		if (!is_valid) {
+			throw not_a_valid_position{ "tried to insert element at an invalid"
+								"position" };
+		}
+		curr = head;
+		while (curr != nullptr) {
+			if (_Pred(std::as_const(curr->data), std::as_const(data)))return false;
 			curr = curr->next;
 		}
 		list_node* ptr{ new (std::nothrow)list_node{data} };
