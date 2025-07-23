@@ -23,7 +23,7 @@ private:
 		template<class ..._Valty>
 		list_node(secretClass, _Valty&& ..._Val)
 			noexcept(std::is_nothrow_constructible_v<_Ty, _Valty...>)
-			:data{ std::forward<_Valty>(_Val)... },prev{}, next{}
+			:data{ std::forward<_Valty>(_Val)... }, prev{}, next{}
 		{
 			//constructs the object in place
 			static_assert(std::is_constructible_v<_Ty, _Valty...>,
@@ -36,7 +36,7 @@ private:
 		list_node* prev;
 		list_node()noexcept(std::is_nothrow_default_constructible_v<_Ty>)
 			:data{}, next{}, prev{}
-		{ 
+		{
 			static_assert(std::is_default_constructible_v<_Ty>, "the type must be"
 				"default constructible in order to use this function");
 		}
@@ -47,7 +47,7 @@ private:
 				"copy constructible in order to use this function");
 		}
 		list_node(_Ty&& item)noexcept(std::is_nothrow_move_constructible_v<_Ty>)
-			:data{std::move(item)}, next{}, prev{}
+			:data{ std::move(item) }, next{}, prev{}
 		{
 			static_assert(std::is_move_constructible_v<_Ty>, "the type must be "
 				"move constructible in order to use this function");
@@ -77,10 +77,12 @@ private:
 	public:
 		//
 		list_node_iterator()noexcept :ptr{}
-		{}
+		{
+		}
 		//
-		list_node_iterator(list_node *ptr1)noexcept:ptr{ptr1}
-		{ }
+		list_node_iterator(list_node* ptr1)noexcept :ptr{ ptr1 }
+		{
+		}
 		//
 		list_node_iterator(const list_node_iterator& other)noexcept = default;
 		//
@@ -207,12 +209,12 @@ private:
 				if (curr != nullptr)curr = curr->prev;
 				else break;
 			}
-			return list_node_iterator{ curr};
+			return list_node_iterator{ curr };
 		}
 		//
 		list_node_iterator operator -=(std::size_t counter)noexcept {
 			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr =ptr->prev;
+				if (ptr != nullptr)ptr = ptr->prev;
 				else break;
 			}
 			return list_node_iterator{ ptr };
@@ -249,10 +251,12 @@ private:
 	public:
 		//
 		list_node_const_iterator()noexcept :ptr{}
-		{}
+		{
+		}
 		//
 		list_node_const_iterator(list_node* ptr1)noexcept :ptr{ ptr1 }
-		{}
+		{
+		}
 		//
 		list_node_const_iterator(const list_node_const_iterator& other)noexcept = default;
 		//
@@ -393,7 +397,7 @@ private:
 		friend double_linked_list<_Ty>;
 	public:
 		//
-		list_node_reverse_iterator()noexcept:ptr{}{}
+		list_node_reverse_iterator()noexcept :ptr{} {}
 		//
 		list_node_reverse_iterator(list_node* ptr1)noexcept :ptr{ ptr1 } {}
 		//
@@ -640,7 +644,7 @@ private:
 			return list_node_const_reverse_iterator{ curr };
 		}
 		//
-		friend list_node_const_reverse_iterator operator+(std::size_t counter, 
+		friend list_node_const_reverse_iterator operator+(std::size_t counter,
 			const list_node_const_reverse_iterator& it)noexcept {
 			return it + counter;
 		}
@@ -783,13 +787,13 @@ private:
 		//if the list is empty ptr is the only node show ptr->prev=nullptr
 		//because tail =nullptr head=tail=ptr;count++;
 		//if the list is not empty tail->next=new node ptr->prev=tail tail=ptr count++
-		list_node* ptr{ new (std::nothrow)list_node{std::forward<_Valty>(_Val)}};
+		list_node* ptr{ new (std::nothrow)list_node{std::forward<_Valty>(_Val)} };
 		if (ptr != nullptr) {
 			ptr->prev = tail;
-			if (head==nullptr) {
+			if (head == nullptr) {
 				head = ptr;
 			}
-			else{
+			else {
 				tail->next = ptr;
 			}
 			tail = ptr;
@@ -804,15 +808,15 @@ private:
 		//this functions simply pushes a new node at the start of the list
 		//if the list is empty ptr->next=nullptr which is head, head=tail=ptr count++;
 		//if the list is not empty ptr->next=head head->prev=ptr head=ptr count++;
-		list_node* ptr{ new(std::nothrow)list_node{std::forward<_Valty>(_Val)}};
+		list_node* ptr{ new(std::nothrow)list_node{std::forward<_Valty>(_Val)} };
 		if (ptr != nullptr) {
 			ptr->next = head;
 			if (head == nullptr) {
-				 tail = ptr;
+				tail = ptr;
 			}
 			else {
 				head->prev = ptr;
-				
+
 			}
 			head = ptr;
 			count++;
@@ -833,7 +837,7 @@ private:
 			head = head->next;
 			delete ptr;
 			if (head == nullptr) {
-				 tail = nullptr;
+				tail = nullptr;
 			}
 			else {
 				head->prev = nullptr;
@@ -856,9 +860,9 @@ private:
 		if (count != 0) {
 			list_node* ptr{ tail };
 			tail = tail->prev;
-			if (tail==nullptr) {
+			if (tail == nullptr) {
 				head = nullptr;
-				
+
 			}
 			else {
 				tail->next = nullptr;
@@ -995,7 +999,7 @@ private:
 	}
 	//add_unique func done//
 	template<typename _Pred1>
-	bool add_unique(list_node_const_iterator pos, const _Ty& data,_Pred1 _Pred) {
+	bool add_unique(list_node_const_iterator pos, const _Ty& data, _Pred1 _Pred) {
 		//this function pretty much uses the same tactic as the insert function above
 		//the only difference is that we check if the element is in the list 
 		//if it is not then we insert it
@@ -1166,7 +1170,7 @@ private:
 		return true;
 	}
 	//is_sorted_ func done 
-	template<typename Compare1,typename Compare2>
+	template<typename Compare1, typename Compare2>
 	bool is_sorted_(Compare1 comp1, Compare2 comp2)const {
 		//this is a func that takes two comparators in order to compare the elements
 		//and determine if they are sorted in descending  and ascending order
@@ -1182,8 +1186,8 @@ private:
 		bool desc = true;
 		//this checks in one pass if they are sorted
 		while (curr != nullptr) {
-			asc=asc&& comp1(std::as_const(prev->data), std::as_const(curr->data));//<=
-			desc=desc&& comp2(std::as_const(prev->data), std::as_const(curr->data));//>=
+			asc = asc && comp1(std::as_const(prev->data), std::as_const(curr->data));//<=
+			desc = desc && comp2(std::as_const(prev->data), std::as_const(curr->data));//>=
 			prev = curr;
 			curr = curr->next;
 		}
@@ -1265,7 +1269,7 @@ public:
 	//
 	double_linked_list(double_linked_list<_Ty>&& other)noexcept;
 	//
-	double_linked_list<_Ty>& operator =(double_linked_list<_Ty>&& other)&noexcept;
+	double_linked_list<_Ty>& operator =(double_linked_list<_Ty>&& other) & noexcept;
 	//
 	double_linked_list<_Ty>& operator =(const std::initializer_list<_Ty>& other)&;
 	//
@@ -1275,12 +1279,12 @@ public:
 	//
 	bool push_back(_Ty&& data);
 	//
-	bool insert_after(const_iterator pos,const _Ty& data);
+	bool insert_after(const_iterator pos, const _Ty& data);
 	//
 	bool add_unique_after(const_iterator pos, const _Ty& data);
 	//
 	template<typename _Pred1>
-	bool add_unique_after(const_iterator pos,const _Ty& data,_Pred1 _Pred);
+	bool add_unique_after(const_iterator pos, const _Ty& data, _Pred1 _Pred);
 	//
 	bool push_front(const _Ty& data);
 	//
@@ -1475,12 +1479,46 @@ public:
 	const_reverse_iterator crend() noexcept {
 		return crfinish();
 	}
+	//unsafe_insert func done// 
+	//use this func only for performance and when you 
+	//know where the iterator points
+	bool unsafe_insert(const_iterator pos, const _Ty& data) {
+		//this is again an insert function which works pretty similar to 
+		//to the insert after func but this func doesn't see if the pos you passed
+		//is valid so only use this func if you know that the iterator that you passed 
+		// points to the list that called the method and also points to an element of this list
+		// not to nothing 
+		//make sure pretty much that the iterator is valid or else the behavior is
+		//undefined
+		if (pos == cend()) {//no valid pos no insertion
+			return false;
+		}
+		list_node* ptr{ new (std::nothrow)list_node{data} };
+		if (ptr == nullptr)return false;
+		//we insert the node after the position simple
+		//doesn't matter where the pos is we insert it either somewhere in the middle
+		//or at the end no difference this code handles both scenarios
+		//if we are in middle we make the first if no need to change tail
+		//if we are at the end we change tail simply 
+		count++;
+		ptr->next = pos.ptr->next;
+		if (pos.ptr->next != nullptr) {
+			pos.ptr->next->prev = ptr;
+		}
+		else {
+			tail = ptr;
+		}
+		pos.ptr->next = ptr;
+		ptr->prev = pos.ptr;
+		return true;
+	}
 };
 //default constructor done//
 template<typename _Ty>
-double_linked_list<_Ty>::double_linked_list()noexcept 
+double_linked_list<_Ty>::double_linked_list()noexcept
 	:head{}, tail{}, count{}
-{ }
+{
+}
 //push_back func done//
 template<typename _Ty>
 bool double_linked_list<_Ty>::push_back(const _Ty& data) {
@@ -1496,13 +1534,13 @@ template<typename _Ty>
 void double_linked_list<_Ty>::show()const {
 	list_node* ptr{ head };
 	while (ptr != nullptr) {
-		std::cout << ptr->data<<" ";
+		std::cout << ptr->data << " ";
 		ptr = ptr->next;
 	}
 	std::cout << "\n\n";
-	ptr= tail ;
-	while (ptr!= nullptr) {
-		std::cout << ptr->data<<" ";
+	ptr = tail;
+	while (ptr != nullptr) {
+		std::cout << ptr->data << " ";
 		ptr = ptr->prev;
 	}
 	std::cout << "\n\n";
@@ -1584,7 +1622,7 @@ double_linked_list<_Ty>::double_linked_list(const double_linked_list<_Ty>& other
 }
 //move constructor done//
 template<typename _Ty>
-double_linked_list<_Ty>::double_linked_list(double_linked_list<_Ty>&&other)noexcept
+double_linked_list<_Ty>::double_linked_list(double_linked_list<_Ty>&& other)noexcept
 	:head{}, tail{}, count{}
 {//if this==&other then swaps nullptr's and 0's no problem 
 	//if this !=&other if other is empty same as case as previous
@@ -1608,7 +1646,7 @@ bool double_linked_list<_Ty>::emplace_front(_Valty&&..._Val) {
 }
 //move operator done//
 template<typename _Ty>
-double_linked_list<_Ty>& double_linked_list<_Ty>::operator =(double_linked_list<_Ty>&& other)&noexcept
+double_linked_list<_Ty>& double_linked_list<_Ty>::operator =(double_linked_list<_Ty>&& other) & noexcept
 {
 	//we just swap the pointer pretty much we steal the data
 	//attention if we move to ourselves we lose our data 
@@ -1620,12 +1658,12 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator =(double_linked_list<
 }
 //insert_after func done// 
 template<typename _Ty>
-bool double_linked_list<_Ty>::insert_after(const_iterator pos,const _Ty& data) {
+bool double_linked_list<_Ty>::insert_after(const_iterator pos, const _Ty& data) {
 	return insert(pos, data);
 }
 //add_unique_after done//
 template<typename _Ty>
-bool double_linked_list<_Ty>::add_unique_after(const_iterator pos,const _Ty& data) {
+bool double_linked_list<_Ty>::add_unique_after(const_iterator pos, const _Ty& data) {
 	return add_unique(pos, data, std::equal_to<>{});
 }
 //add_unique_after done//
@@ -1633,7 +1671,7 @@ template<typename _Ty>
 template<typename _Pred1>
 bool double_linked_list<_Ty>::add_unique_after(const_iterator pos, const _Ty& data,
 	_Pred1 _Pred) {
-	return add_unique(pos, data,_Pred);
+	return add_unique(pos, data, _Pred);
 }
 //remove func done//
 template<typename _Ty>
@@ -1708,7 +1746,7 @@ operator=(const std::initializer_list<_Ty>& other)& {
 	//if size<other.size we have to allocate some new nodes so
 	//curr1==nullptr and curr2!=other.end() show we go to the first if 
 	list_node* prev1{ nullptr };
-	list_node* curr1{ head};
+	list_node* curr1{ head };
 	static_assert(std::is_copy_assignable_v<_Ty>, "you must be able to do this:"
 		"curr1->data=*curr2");
 	static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be destructible without throwing");
@@ -1721,7 +1759,7 @@ operator=(const std::initializer_list<_Ty>& other)& {
 		prev2 = curr2;
 		curr2++;
 	}
-	if (prev1 == nullptr && other.size() != 0|| curr1 == nullptr && curr2 != other.end()) {
+	if (prev1 == nullptr && other.size() != 0 || curr1 == nullptr && curr2 != other.end()) {
 		while (curr2 != other.end()) {
 			if (!push_back(*curr2)) {
 				clear();
