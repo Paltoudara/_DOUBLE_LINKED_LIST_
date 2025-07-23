@@ -1481,7 +1481,7 @@ public:
 	}
 	//unsafe_insert func done// 
 	//use this func only for performance and when you 
-	//know where the iterator points
+	//know where the iterator points be very careful
 	bool unsafe_insert(const_iterator pos, const _Ty& data) {
 		//this is again an insert function which works pretty similar to 
 		//to the insert after func but this func doesn't see if the pos you passed
