@@ -1607,7 +1607,9 @@ public:
 		ptr->prev = pos.ptr;
 		return true;
 	}
-	//unsafe_erase func 
+	//unsafe_erase func done//
+	//use this func only for performance and when you 
+	//know where the iterator points be very careful
 	bool unsafe_erase(const_iterator pos)noexcept {
 		//this function works pretty similar to the erase_after function 
 		//the only difference is that this func doesn't see if the pos you passed
