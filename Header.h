@@ -1992,7 +1992,7 @@ template<typename _Ty>
 void double_linked_list<_Ty>::merge(double_linked_list<_Ty>&& other) {
 	merge_lists(other, std::less_equal<>{});
 }
-//erase_after func 
+//erase_after func done// 
 template<typename _Ty>
 bool double_linked_list<_Ty>::erase_after(const_iterator pos) {
 	return erase(pos);
