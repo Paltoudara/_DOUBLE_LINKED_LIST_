@@ -60,16 +60,31 @@ private:
 
 		}
 	};
-	//thats my own iterator class
-	//pretty much it is just a wrapper arroung my pointer 
-	//it also has operator ++ in order to advance the pointer 
-	//it also has += in order to progress it even further
-	//it also has != and == for comparisons and operator *
-	//with references qualifiers ,pretty much all that matters is where the pointer
-	//shows 
-	//and it also supports operator --,-,-=
-	//pretty much the iterator is like if the pointer is null pointer dont move
-	//else move 
+	// This is a custom iterator class.
+	// It acts as a lightweight wrapper around a raw pointer to a list node.
+	// 
+	// Supported operations:
+	// - operator++       : Advances the iterator to the next node.
+	// - operator+=       : Advances the iterator forward by a given number of steps.
+	// - operator*        : Dereferences the iterator to access the node's data.
+	// - operator==/!=    : Compares two iterators for equality.
+	// - operator ->	  : Used to acess the methods of the contained object.
+	// - operator +		  : Just to return a temporary iterator to a position forward.
+	// - operator -		  : Just to return a temporary iterator to a position backward.
+	// - operator --      : Advances the iterator to the previous node.
+	// - operator -=	  : Advances the iterator backward by a given number of steps.
+	// - Reference qualifiers are applied where appropriate.
+	// 
+	// ATTENTION:
+	// This iterator does not track validity. If it becomes invalidated 
+	// (e.g., due to node removal), it is your responsibility to ensure it 
+	// is not used in that state. Use the iterator only when you are certain 
+	// it points to a valid node or is `nullptr`. 
+	// ,pretty much all that matters is where the pointer
+	//shows and remember this iterator is only to get the element and change it also
+	//Also one last thing, when the iterator is nullptr all the operations 
+	// supported will not work if you call them for this iterator
+	//because its nullptr now assign it to point to a valid node
 	class list_node_iterator final {
 	private:
 		list_node* ptr;
@@ -234,16 +249,31 @@ private:
 			ptr = nullptr;
 		}
 	};
-	//thats my own const_iterator class
-	//pretty much it is just a wrapper arroung my pointer 
-	//it also has operator ++ in order to advance the pointer 
-	//it also has += in order to progress it even further
-	//it also has != and == for comparisons and operator *
-	//with references qualifiers only for const 
+	// This is a custom const_iterator class.
+	// It acts as a lightweight wrapper around a raw pointer to a list node.
+	// 
+	// Supported operations:
+	// - operator++       : Advances the iterator to the next node.
+	// - operator+=       : Advances the iterator forward by a given number of steps.
+	// - operator*        : Dereferences the iterator to access the node's data.
+	// - operator==/!=    : Compares two iterators for equality.
+	// - operator ->	  : Used to acess the methods of the contained object.
+	// - operator +		  : Just to return a temporary iterator to a position forward.
+	// - operator -		  : Just to return a temporary iterator to a position backward.
+	// - operator --      : Advances the iterator to the previous node.
+	// - operator -=	  : Advances the iterator backward by a given number of steps.
+	// - Reference qualifiers are applied where appropriate.
+	// 
+	// ATTENTION:
+	// This iterator does not track validity. If it becomes invalidated 
+	// (e.g., due to node removal), it is your responsibility to ensure it 
+	// is not used in that state. Use the iterator only when you are certain 
+	// it points to a valid node or is `nullptr`. 
 	// ,pretty much all that matters is where the pointer
-	//shows and remember this iterator is only to get the element not change it
-	//it also supports operators: --,-,-=
-	//it pretty much behaves like a real iterator 
+	//shows and remember this iterator is only to get the element not to change it 
+	//Also one last thing, when the iterator is nullptr all the operations 
+	// supported will not work if you call them for this iterator
+	//because its nullptr now assign it to point to a valid node
 	class list_node_const_iterator final {
 	private:
 		list_node* ptr;
@@ -381,16 +411,31 @@ private:
 			ptr = nullptr;
 		}
 	};
-	//list_noder_reverse_iterator it has the same 
-	//methods as the other iterators with some differences
-	//first the operator ++ makes the iterator go backwards not forward
-	//it supports the operator != and == and the operators * and ->
-	//second it supports the operator += which again makes the iterator go backwards
-	//because its a reverse iterator 
-	//operator + return a temporary iterator .operator -- in that case make the iterator
-	//go forward now (its reverse iterator),operator - same case 
-	//also remember this iterator class pretty much is a wrapper around a list node
-	//pointer so every operation modifies the pointer or uses it for something 
+	// This is a custom reverse_iterator class.
+	// It acts as a lightweight wrapper around a raw pointer to a list node.
+	// 
+	// Supported operations:
+	// - operator++       : Advances the iterator to the previous node.
+	// - operator+=       : Advances the iterator backward by a given number of steps.
+	// - operator*        : Dereferences the iterator to access the node's data.
+	// - operator==/!=    : Compares two iterators for equality.
+	// - operator ->	  : Used to acess the methods of the contained object.
+	// - operator +		  : Just to return a temporary iterator to a position backward.
+	// - operator -		  : Just to return a temporary iterator to a position forward.
+	// - operator --      : Advances the iterator to the next node.
+	// - operator -=	  : Advances the iterator forward by a given number of steps.
+	// - Reference qualifiers are applied where appropriate.
+	// 
+	// ATTENTION:
+	// This iterator does not track validity. If it becomes invalidated 
+	// (e.g., due to node removal), it is your responsibility to ensure it 
+	// is not used in that state. Use the iterator only when you are certain 
+	// it points to a valid node or is `nullptr`. 
+	// ,pretty much all that matters is where the pointer
+	//shows and remember this iterator is only to get the element and change it also
+	//Also one last thing, when the iterator is nullptr all the operations 
+	// supported will not work if you call them for this iterator
+	//because its nullptr, now assign it to point to a valid node
 	class list_node_reverse_iterator final {
 	private:
 		list_node* ptr;
@@ -551,17 +596,31 @@ private:
 			ptr = nullptr;
 		}
 	};
-	//list_noder_const_reverse_iterator it has the same 
-	//methods as the other iterators with some differences
-	//first the operator ++ makes the iterator go backwards not forward
-	//it supports the operator != and == and the operators * and ->
-	//second it supports the operator += which again makes the iterator go backwards
-	//because its a reverse iterator 
-	//operator + return a temporary iterator .operator -- in that case make the iterator
-	//go forward now (its reverse iterator),operator - same case 
-	//also remember this iterator class pretty much is a wrapper around a list node
-	//pointer so every operation modifies the pointer or uses it for something 
-	//also note that this iterator only gives the item for reading not for changing it
+	// This is a custom const_reverse_iterator class.
+	// It acts as a lightweight wrapper around a raw pointer to a list node.
+	// 
+	// Supported operations:
+	// - operator++       : Advances the iterator to the previous node.
+	// - operator+=       : Advances the iterator backward by a given number of steps.
+	// - operator*        : Dereferences the iterator to access the node's data.
+	// - operator==/!=    : Compares two iterators for equality.
+	// - operator ->	  : Used to acess the methods of the contained object.
+	// - operator +		  : Just to return a temporary iterator to a position backward.
+	// - operator -		  : Just to return a temporary iterator to a position forward.
+	// - operator --      : Advances the iterator to the next node.
+	// - operator -=	  : Advances the iterator forward by a given number of steps.
+	// - Reference qualifiers are applied where appropriate.
+	// 
+	// ATTENTION:
+	// This iterator does not track validity. If it becomes invalidated 
+	// (e.g., due to node removal), it is your responsibility to ensure it 
+	// is not used in that state. Use the iterator only when you are certain 
+	// it points to a valid node or is `nullptr`. 
+	// ,pretty much all that matters is where the pointer
+	//shows and remember this iterator is only to get the element and not to change it 
+	//Also one last thing, when the iterator is nullptr all the operations 
+	// supported will not work if you call them for this iterator
+	//because its nullptr now assign it to point to a valid node
 	class list_node_const_reverse_iterator final {
 	private:
 		list_node* ptr;
@@ -1250,6 +1309,40 @@ private:
 		other.count = 0;
 
 	}
+	//erase func done//
+	bool erase(list_node_const_iterator pos) {
+		//this is an erase function that deletes the element after the pos you gave
+		//we check if the iterator is nullptr or it points to a node
+		//note that the iterator must point to the list that called the method and 
+		//must point to a valid node of that list
+		//we check this with the while, if is_valid=false; then we throw exception
+		//else we delete the node successfuly
+		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be"
+			"destructible without throwing");
+		if (pos == cend())return false;
+		list_node* curr{ head };
+		bool is_valid = false;
+		while (curr != nullptr) {
+			if (pos.ptr == curr)is_valid = true;
+			curr = curr->next;
+		}
+		if (!is_valid) {
+			throw not_a_valid_position{ "tried to insert element at an invalid"
+								 "position" };
+		}
+		count--;
+		if (pos.ptr->next == nullptr)return false;
+		list_node* ptr{ pos.ptr->next };
+		pos.ptr->next = ptr->next;
+		if (ptr->next == nullptr) {
+			tail = pos.ptr;
+		}
+		else {
+			ptr->next->prev = pos.ptr;
+		}
+		delete ptr;
+		return true;
+	}
 public:
 	using iterator = list_node_iterator;
 	using const_iterator = list_node_const_iterator;
@@ -1340,6 +1433,8 @@ public:
 	//
 	template<typename Compare1, typename Compare2 >
 	bool is_sorted(Compare1 comp1, Compare2 comp2)const;
+	//
+	bool erase_after(const_iterator pos);
 	//
 	~double_linked_list()noexcept;
 	bool empty()const noexcept {
@@ -1510,6 +1605,31 @@ public:
 		}
 		pos.ptr->next = ptr;
 		ptr->prev = pos.ptr;
+		return true;
+	}
+	//unsafe_erase func 
+	bool unsafe_erase(const_iterator pos)noexcept {
+		//this function works pretty similar to the erase_after function 
+		//the only difference is that this func doesn't see if the pos you passed
+		//is valid so only use this func if you know that the iterator that you passed 
+		// points to the list that called the method and also points to an element of this list
+		// not to nothing 
+		//make sure pretty much that the iterator is valid or else the behavior is
+		//undefined
+		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be"
+			"destructible without throwing");
+		if (pos == cend())return false;
+		count--;
+		if (pos.ptr->next == nullptr)return false;
+		list_node* ptr{ pos.ptr->next };
+		pos.ptr->next = ptr->next;
+		if (ptr->next == nullptr) {
+			tail = pos.ptr;
+		}
+		else {
+			ptr->next->prev = pos.ptr;
+		}
+		delete ptr;
 		return true;
 	}
 };
@@ -1871,4 +1991,8 @@ void double_linked_list<_Ty>::merge(double_linked_list<_Ty>&& other) {
 	merge_lists(other, std::less_equal<>{});
 }
 //
+template<typename _Ty>
+bool double_linked_list<_Ty>::erase_after(const_iterator pos) {
+	return erase(pos);
+}
 _PANAGIOTIS_END
