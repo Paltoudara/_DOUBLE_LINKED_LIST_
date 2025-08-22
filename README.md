@@ -38,4 +38,4 @@
     
 # 👥CONTRIBUTORS:
 
-🎨~The-Mastermind1
+🎨~Paltoudara
