@@ -1,41 +1,301 @@
-# 📚_DOUBLE_LINKED_LIST_
-# Simple DOUBLE LINKED LSIT header that i created using C++
-🔗 AN entire _DOUBLE_LINKED_LIST_ with all the basic features:
-</br>
-1. 1️⃣an inside class of a simple list node that has pointers to previous and next with constructors<br>
-~the default </br>
-~with const element</br>
-~with move element</br>
-~and a private constructor used to craft the object in place (see implementation)
-2. 2️⃣an inside class of a simple iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),
-   with the iterator you have access to change the element or to see it and advance or go backwards
-   operations supported: ++,!=,==,*,+=,->,+,--,-,-= and a couple of constructors and adestructor and acopy operator and a move operator
-3. 3️⃣another inside class of a simple const iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),this kind of iterator works pretty similar to the iterator that we talked above the only difference is
-   that this iterator is only used to see elements not to change them
-4. 4️⃣another inside class of a simple reverse iterator (pretty much a wrapper around a pointer that points to a node or to nothing nullptr),this kind of iterator again is similar to the iterators talked above but this time the operations      that are for advance make the iterator go backwards and the operations to go backwards this time make you go forward like : ++,+=,+ make you go backward in the list, and --,-=,- make you go forward in the list
-5. 5️⃣another inside class of a simple const reverse iterator the differences with this and the reverse iterator is that now we can only see elements not change them
-6. 6️⃣the private funcs start,finish,cstart,cfinish,rstart,rfinish,crstart,crfinish,
-7. 7️⃣the private members head,tail,count in order to maintain and manipulate the list
-8. 8️⃣push_back function which puts the element at  the end of the list
-9. 9️⃣push_front function  which put the element at the start of the list
-10. 🔟pop_front which delete the first element of the list
-11. 1️⃣1️⃣pop_back which delete the last element of the list
-12. 1️⃣2️⃣clear this function is used to deallocate the list
-13. 1️⃣3️⃣reverse this function just reverses the list nothing more
-14. 1️⃣4️⃣emplace_back this function is the same with push_back, the only difference is that the pointer is crafted differently from push_back, the object of the node is crafted in place
-15. 1️⃣5️⃣emplace_front this function is the same with push_front, the only difference is that the pointer is crafted differently from push_front, the object of the node is crafted in place
-16. 1️⃣6️⃣insert ,this function takes a const_iterator position and inserts the element after this position
-17. 1️⃣7️⃣add_unique pretty much is the same case with insert except that the only difference is that we search the list to find if the element exists if we find it we do not insert it
-18. 1️⃣8️⃣erase_node_if erases nodes of the list if a certain condition is met with the help of the passed function the argument _Pred
-19. 1️⃣9️⃣delete_duplicates,it just deletes the duplicates but we consider that the list is sorted if it is not we might want to use a hashset in order to keep track of the elements
-20. 2️⃣0️⃣is_ascending_ checks if the elements are in ascending order using a compare func
-21. 2️⃣1️⃣is_descending_ checks if the elements are in descending order using a compare func
-22. 2️⃣2️⃣is_sorted_ checks if the elements are either sorted in  ascending or descending order
-23. 2️⃣3️⃣merge_lists just combines two lists and leaves the other empty,in order for this func to work properly we consider that the two lists are sorted in ascending order and the other list is not empty else whats the point
-    and also we must not try to merge a list into itselft simple enough
-# 📬IF YOU HAVE ANY ISSEUES ON THIS PLZ FEEL FREE TO SUBMIT THEM 📬
+# 📚WELCOME TO THE DOUBLE_LINKED_LIST API 🌐:
+# 🧩 Interface:
+```markdown
+```cpp
+template<typename _Ty>
+class double_linked_list final {
+public:
+	using iterator = list_node_iterator;
+	using const_iterator = list_node_const_iterator;
+	using reverse_iterator = list_node_reverse_iterator;
+	using const_reverse_iterator = list_node_const_reverse_iterator;
+	static_assert(std::is_object_v<_Ty>, "The C++ Standard forbids container adaptors of non-object types "
+		"because of [container.requirements].");
+	static_assert(!std::is_reference_v<_Ty>, "no references allowed");
+	static_assert(!std::is_const_v<_Ty>, "no const types are allowed");
+	static_assert(!std::is_volatile_v<_Ty>, "no volatile types are allowed");
+	//
+	double_linked_list()noexcept;
+	//
+	double_linked_list(const std::initializer_list<_Ty>& other);
+	//
+	double_linked_list(const double_linked_list<_Ty>& other);
+	//
+	double_linked_list(double_linked_list<_Ty>&& other)noexcept;
+	//
+	double_linked_list<_Ty>& operator =(double_linked_list<_Ty>&& other) & noexcept;
+	//
+	double_linked_list<_Ty>& operator =(const std::initializer_list<_Ty>& other)&;
+	//
+	double_linked_list<_Ty>& operator =(const double_linked_list<_Ty>& other)&;
+	//
+	bool push_back(const _Ty& data);
+	//
+	bool push_back(_Ty&& data);
+	//
+	bool insert_after(const_iterator pos, const _Ty& data);
+	//
+	bool add_unique_after(const_iterator pos, const _Ty& data);
+	//
+	template<typename _Pred1>
+	bool add_unique_after(const_iterator pos, const _Ty& data, _Pred1 _Pred);
+	//
+	bool push_front(const _Ty& data);
+	//
+	template<class..._Valty>
+	bool emplace_back(_Valty&&..._Val);
+	//
+	template<class..._Valty>
+	bool emplace_front(_Valty&&..._Val);
+	//
+	bool push_front(_Ty&& data);
+	//
+	void pop_front();
+	//
+	void pop_back();
+	//
+	void show()const;
+	//
+	void reverse()noexcept;
+	//
+	void remove(const _Ty& data);
+	//
+	template<typename _Pred1>
+	void remove_if(_Pred1 _Pred);
+	//
+	void unique();
+	//
+	template<typename _Pred1>
+	void unique(_Pred1 _Pred);
+	//
+	void swap(double_linked_list<_Ty>& other)noexcept;
+	//
+	bool is_ascending()const;
+	//
+	template<typename Compare>
+	bool is_ascending(Compare comp)const;
+	//
+	bool is_descending()const;
+	//
+	void merge(double_linked_list<_Ty>& other);
+	//
+	void merge(double_linked_list<_Ty>&& other);
+	//
+	template<typename Compare>
+	void merge(double_linked_list<_Ty>& other, Compare comp);
+	//
+	template<typename Compare>
+	void merge(double_linked_list<_Ty>&& other, Compare comp);
+	//
+	template<typename Compare>
+	bool is_descending(Compare comp)const;
+	//
+	bool is_sorted()const;
+	//
+	template<typename Compare1, typename Compare2 >
+	bool is_sorted(Compare1 comp1, Compare2 comp2)const;
+	//
+	bool erase_after(const_iterator pos);
+	//
+	~double_linked_list()noexcept;
+	bool empty()const noexcept {
+		//checs if the list is empty 
+		return count == 0;
+	}
+	//
+	std::size_t size()const noexcept {
+		//it just shows the number of nodes the list currently has 
+		return count;
+	}
+	//
+	_NODISCARD _Ty&& back()&& {
+		if (count == 0) {
+			throw tried_to_access_an_empty_list_{ "tried to access  an empty list" };
+		}
+		return std::move(tail->data);
 
-    
-# 👥CONTRIBUTORS:
+	}
+	//
+	_NODISCARD const _Ty&& back()const&& {
+		if (count == 0) {
+			throw tried_to_access_an_empty_list_{ "tried to access  an empty list" };
+		}
+		return std::move(tail->data);
 
-🎨~Paltoudara
+	}
+	//
+	_NODISCARD const _Ty& back()const& {
+		if (count == 0) {
+			throw tried_to_access_an_empty_list_{ "tried to access  an empty list" };
+		}
+		return tail->data;
+
+	}
+	//
+	_NODISCARD _Ty& back()& {
+		if (count == 0) {
+			throw tried_to_access_an_empty_list_{ "tried to access  an empty list" };
+		}
+		return tail->data;
+
+	}
+	//
+	_NODISCARD const _Ty& front()const& {
+		if (count == 0) {
+			throw tried_to_access_an_empty_list_{ "tried to access  an empty list" };
+		}
+		return head->data;
+
+	}
+	//
+	_NODISCARD _Ty& front()& {
+		if (count == 0) {
+			throw tried_to_access_an_empty_list_{ "tried to access  an empty list" };
+		}
+		return head->data;
+
+	}
+	//
+	_NODISCARD _Ty&& front()&& {
+		if (count == 0) {
+			throw tried_to_access_an_empty_list_{ "tried to access  an empty list" };
+		}
+		return std::move(head->data);
+
+	}
+	//
+	_NODISCARD const _Ty&& front()const&& {
+		if (count == 0) {
+			throw tried_to_access_an_empty_list_{ "tried to access  an empty list" };
+		}
+		return std::move(head->data);
+
+	}
+	//begin func done// 
+	iterator begin()const noexcept {
+		return start();
+	}
+	//begin func done// 
+	iterator begin()noexcept {
+		return start();
+	}
+	//end func done// 
+	iterator end()const noexcept {
+		return finish();
+	}
+	//end func done// 
+	iterator end() noexcept {
+		return finish();
+	}
+	//begin func done //
+	const_iterator cbegin()const noexcept {
+		return cstart();
+	}
+	//begin func done// 
+	const_iterator cbegin()noexcept {
+		return cstart();
+	}
+	//end func done// 
+	const_iterator cend()const noexcept {
+		return cfinish();
+	}
+	//end func done// 
+	const_iterator cend() noexcept {
+		return cfinish();
+	}
+	//rbegin func done// 
+	reverse_iterator rbegin()noexcept {
+		return rstart();
+	}
+	//rbegin func done// 
+	reverse_iterator rbegin()const noexcept {
+		return rstart();
+	}
+	//rend func done// 
+	reverse_iterator rend()const noexcept {
+		return rfinish();
+	}
+	//rend func done// 
+	reverse_iterator rend() noexcept {
+		return rfinish();
+	}
+	//crbegin func done// 
+	const_reverse_iterator crbegin()noexcept {
+		return crstart();
+	}
+	//crbegin func done// 
+	const_reverse_iterator crbegin()const noexcept {
+		return crstart();
+	}
+	//crend func done// 
+	const_reverse_iterator crend()const noexcept {
+		return crfinish();
+	}
+	//crend func done// 
+	const_reverse_iterator crend() noexcept {
+		return crfinish();
+	}
+	//unsafe_insert func done// 
+	//use this func only for performance and when you 
+	//know where the iterator points be very careful
+	bool unsafe_insert(const_iterator pos, const _Ty& data) {
+		//this is again an insert function which works pretty similar to 
+		//to the insert after func but this func doesn't see if the pos you passed
+		//is valid so only use this func if you know that the iterator that you passed 
+		// points to the list that called the method and also points to an element of this list
+		// not to nothing 
+		//make sure pretty much that the iterator is valid or else the behavior is
+		//undefined
+		if (pos == cend()) {//no valid pos no insertion
+			return false;
+		}
+		list_node* ptr{ new (std::nothrow)list_node{data} };
+		if (ptr == nullptr)return false;
+		//we insert the node after the position simple
+		//doesn't matter where the pos is we insert it either somewhere in the middle
+		//or at the end no difference this code handles both scenarios
+		//if we are in middle we make the first if no need to change tail
+		//if we are at the end we change tail simply 
+		count++;
+		ptr->next = pos.ptr->next;
+		if (pos.ptr->next != nullptr) {
+			pos.ptr->next->prev = ptr;
+		}
+		else {
+			tail = ptr;
+		}
+		pos.ptr->next = ptr;
+		ptr->prev = pos.ptr;
+		return true;
+	}
+	//unsafe_erase func done//
+	//use this func only for performance and when you 
+	//know where the iterator points be very careful
+	bool unsafe_erase(const_iterator pos)noexcept {
+		//this function works pretty similar to the erase_after function 
+		//the only difference is that this func doesn't see if the pos you passed
+		//is valid so only use this func if you know that the iterator that you passed 
+		// points to the list that called the method and also points to an element of this list
+		// not to nothing 
+		//make sure pretty much that the iterator is valid or else the behavior is
+		//undefined
+		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be"
+			"destructible without throwing");
+		if (pos == cend())return false;
+		count--;
+		if (pos.ptr->next == nullptr)return false;
+		list_node* ptr{ pos.ptr->next };
+		pos.ptr->next = ptr->next;
+		if (ptr->next == nullptr) {
+			tail = pos.ptr;
+		}
+		else {
+			ptr->next->prev = pos.ptr;
+		}
+		delete ptr;
+		return true;
+	}
+};
+
+
+```
