@@ -160,4 +160,35 @@ THIS IS THE INTERFACE OF THE DOUBLE_LINKED_LIST ,WITH THIS INTERFACE YOU CAN MAN
 ONLY ELEMENTS THAT ARE NOTHROW DESTRUCTIBLE
 
 # ⚙️Member functions
+1) default constructor, this function makes the list in the default state
+
+2) constructor with initializer list,if the function fails then the list is left in the default state (strong exception guarantee) else we just copy the elements of intializer list (deep copy)
+
+3) copy constructor is exactly the same as the previous constructor this time the other is a double_linked_list argument,if the function fails then the list is left in the default state (strong exception guarantee)
+
+4) move constructor,it just steals the contents of the other list and leaves it in the default state ,if this==&other then the list is left in the default state
+
+5) the destructor deallocates all the list that was allocated (if it was) and returns the list back to the default state ,if the list is empty this func doesn't do anything
+
+6) push_back funtion,this function just creates a list node and pushes it by copy or move at the end of the list,if something goes wrong this function doesn't do anything(strong exception guarantee)
+
+7) push_front, this function just creates a list node and pushes it by copy or move at the start of the list,if something goes wrong this function doesn't do anything (strong exception guarantee)
+
+8) pop_front,this function just deletes the first node of the list and updates the list ,if there exists at least one node to delete,WARNING: calling this function while the list is empty will throw an pop_from_an_empty_list exception
+
+9) pop_back,this function just deletes the last node of the list and updates the list ,if there exists at least one node to delete,WARNING: calling this function while the list is empty will throw an pop_from_an_empty_list exception
+
+10) show,this function prints the list forward and backward so we know that the list is valid forward and backward,use this funtion only if the elements that the container holds are printable
+
+11) reverse,this function just reverses the list in place,if the list is like 1 2 3 4 5 the result will be 5 4 3 2 1 the reverse proccess goes like this: 12345->21345->32145->43215->54321
+
+12) swap,this function simply swaps the contents of two double linked lists ,if this==&other then nothing happens
+
+13) emplace_back,this function works pretty similar to the push_back function but this time  we craft the element in place with the arguments passed and we create the list node
+
+14) emplace_front,this fucntion works pretty similar to the push_front function but this time we craft the element in place with the arguments passed and we create the list node
+
+15) move operator,deallocs our contents and steals the other's contents, WARNING: moving into ourselves will put the list in the default state so we will lose our resources
+
+16) insert_after,
 
