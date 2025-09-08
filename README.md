@@ -190,11 +190,11 @@ ONLY ELEMENTS THAT ARE NOTHROW DESTRUCTIBLE
 
 15) move operator,deallocs our contents and steals the other's contents, WARNING: moving into ourselves will put the list in the default state so we will lose our resources
 
-16) insert_after,this funtion takes an argument pos and a copy of a value to insert it after the pos,if the pos points to nothing then nothing happens,if the position is invalid or doesn't belong in the list that called the method an exception will be thrown not_a_valid_position exception
+16) insert_after,this funtion takes an argument pos and a copy of a value to insert it after the pos,if the pos points to nothing then nothing happens,if the position is invalid or doesn't point to a valid node of the list  that called the method an exception will be thrown not_a_valid_position exception
 
 17) add_unique_after,has exactly the same behavior as the insert_after function,the only thing that is different is that if the element is already at the list and we can see this with the help of a comparator passed to this function,then nothing happens to the list (see implementation for more details of how this works)
 
-18) remove,this function simply removes the values of the list that compare equal to the value passed as argument,if something goes wrong this funtion might delete some of the elements in the list that compare equal to the value passed or none of them (see implementation for more details of how this works)
+18) remove,this function simply removes the values of the list that compare equal to the value passed as argument,if something goes wrong this funtion might delete some of the elements in the list that compare equal to the value passed or none of them  (see implementation for more details of how this works)
 
 19) remove_if,this function works pretty similar with the remove function but this time we remove elements based on a condition passed by the user (see implementation for more details of how this works)
 
@@ -206,15 +206,15 @@ ONLY ELEMENTS THAT ARE NOTHROW DESTRUCTIBLE
 
 23) is_sorted only tells if the list is sorted or not ,either in ascending order or descending order using a comparator passed as argument (strong exception guarantee) (see implementation for more details of how this works)
 
-24) copy operator the copy operator just copies the contents of the other to us ,we make a deep copy ,if something goes wrong the list might change in some way ,or may return to the default state (see implementation for more details of how this works) ,in the while if a copy goes wrong the list is left with some values or none changed if something goes wrong in the if with the push_back we delete what we managed to allocate and return to default state because copy all or copy none
+24) copy operator the copy operator just copies the contents of the other to us ,we make a deep copy ,if something goes wrong the list might change in some way ,or may return to the default state (see implementation for more details of how this works) ,in the first while if a copy goes wrong the list is left with some values or none changed if something goes wrong in the if with the push_back we delete what we managed to allocate and return to default state because copy all or copy none
 
 25) copy operator with initializer list as argument works exactly the same way as the original copy operator
 
-26) merge ,this function merges two lists if they are both in ascending order and the other argument is not empty ,also we can't merge into ourselves ,if something goes wrong the behavior is complicated (see implementation for more details of how this works) and read it very carefully ,WARNING:the comparator used to merge the list in order to compare elements must not throw otherwise the behavior is undefined
+26) merge ,this function merges two lists if they are both in ascending order and the other argument is not empty ,also we can't merge into ourselves ,if something goes wrong the behavior is complicated (see implementation for more details of how this works) and read it very carefully ,WARNING:the comparator used to merge the list in order to compare elements must not throw!!!
 
-27) erase_after ,this function takes an iterator pos and deletes the element after this position you gave,if the position is invalid or doesn't belong in the list that called the method an exception will be thrown not_a_valid_position exception
+27) erase_after ,this function takes an iterator pos and deletes the element after this position you gave,if the position is invalid or doesn't  point to a valid node of  the list that called the method an exception will be thrown not_a_valid_position exception
 
-28) unsafe_insert,this function does the same thing as the insert_after function but the only difference is that it doesn' check (for performance reasons) if the iterator passed is invalid or doesn't point to the list that called the method,use this func if you know exactly that the iterator you passed is valid and it shows in the list that called the method be very careful ,otherwise the behavior is undefined
+28) unsafe_insert,this function does the same thing as the insert_after function but the only difference is that it doesn' check (for performance reasons) if the iterator passed is invalid or doesn't point to a valid node of the list that called the method,use this func if you know exactly that the iterator you passed is valid and it shows in a node of the list that called the method be very careful ,otherwise the behavior is undefined
 
 29) unsafe_erase is the same case as erase_after and has the same concept idea as unsafe_insert,use this func with care because it doesn't make checks (this is for performance purposes)
 
