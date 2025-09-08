@@ -7,7 +7,7 @@
 #include<cstdlib>
 #include<utility>
 #include<memory>
-#include"Macros.h"
+#include"Header.h"
 #include<functional>
 _PANAGIOTIS_BEGIN
 //-----------------------
@@ -1063,13 +1063,13 @@ public:
 	//know where the iterator points be very careful
 	bool unsafe_insert(const_iterator pos, const _Ty& data) {
 		//this is again an insert function which works pretty similar to 
-		//to the insert after func but this func doesn't see if the pos you passed
+		//to the insert_after func but this func doesn't see if the pos you passed
 		//is valid so only use this func if you know that the iterator that you passed 
-		// points to the list that called the method and also points to an element of this list
-		// not to nothing 
+		//points to the list that called the method and also points to a valid element of this list
+		//not to nothing 
 		//make sure pretty much that the iterator is valid or else the behavior is
 		//undefined
-		if (pos == cend()) {//no valid pos no insertion
+		if (pos.ptr == nullptr) {//pos points to nothing don't do anything
 			return false;
 		}
 		list_node* ptr{ new (std::nothrow)list_node{data} };
@@ -1098,8 +1098,8 @@ public:
 		//this function works pretty similar to the erase_after function 
 		//the only difference is that this func doesn't see if the pos you passed
 		//is valid so only use this func if you know that the iterator that you passed 
-		// points to the list that called the method and also points to an element of this list
-		// not to nothing 
+		//points to the list that called the method and also points to a valid element of this list,
+		//not to nothing 
 		//make sure pretty much that the iterator is valid or else the behavior is
 		//undefined
 		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be"
@@ -1208,7 +1208,7 @@ template<typename _Ty>
 double_linked_list<_Ty>::double_linked_list(const std::initializer_list<_Ty>& other)
 	:head{}, tail{}, count{}
 {//if the push_backs fail, give back everything allocated and return
-	//the object inm the default state
+	//the object in the default state
 	try {
 		const _Ty* ptr{ other.begin() };
 		for (std::size_t i = 0; i < other.size(); i++) {
@@ -1278,7 +1278,7 @@ bool double_linked_list<_Ty>::emplace_front(_Valty&&..._Val) {
 template<typename _Ty>
 double_linked_list<_Ty>& double_linked_list<_Ty>::operator =(double_linked_list<_Ty>&& other) & noexcept
 {
-	//we just swap the pointer pretty much we steal the data
+	//we just swap the pointers, pretty much we steal the data of other
 	//attention if we move to ourselves we lose our data 
 	clear();
 	std::swap(head, other.head);
@@ -1362,12 +1362,12 @@ bool double_linked_list<_Ty>::is_sorted(Compare1 comp1, Compare2 comp2)const {
 template<typename _Ty>
 double_linked_list<_Ty>& double_linked_list<_Ty>::
 operator=(const std::initializer_list<_Ty>& other)& {
-	//thats the copy with initializer list it works with the method prev curr
+	//thats the copy operator with initializer list it works with the method prev curr
 	//in order to avoid unecessary allocations
 	//there 5 scenarios
-	// we are empty so nothing happens
+	//we are empty so nothing happens
 	//one of the lists is empty 
-	//if this empty prev1==nullptr and other.size()!=0 and we go first if
+	//if this empty prev1==nullptr and curr2!=other.end() and we go first if
 	//if the other one is empty prev2==nullptr &&curr1!=nuullptr then we must call the destructor in the
 	// second if 
 	//if both have elements equally nothing happens we just copy the elements
@@ -1390,7 +1390,8 @@ operator=(const std::initializer_list<_Ty>& other)& {
 		curr2++;
 	}
 	if (prev1 == nullptr && curr2!=other.end() || curr1 == nullptr && curr2 != other.end()) {
-		try {
+		try {//if push_back goes wrong dealloc everything that
+			//we might have allocated and return
 			while (curr2 != other.end()) {
 				if (!push_back(*curr2)) {
 					clear();
@@ -1398,13 +1399,14 @@ operator=(const std::initializer_list<_Ty>& other)& {
 				}
 				curr2++;
 			}
-		}
+		}//clear everything that we might have pushed so far
 		catch (...) {
 			clear();
 		}
 		return *this;
 	}
 	if (prev2 == nullptr && curr1 != nullptr) {
+		//the other is empty clear everything
 		clear();
 		return *this;
 	}
@@ -1429,7 +1431,7 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 	//thats the copy operator it works with the method prev curr
 	//in order to avoid unecessary allocations
 	//there 5 scenarios
-	// we are empty so nothing happens
+	//we are empty so nothing happens
 	//one of the lists is empty 
 	//if this empty prev1==nullptr and curr2!=nullptr and we go first if
 	//if the other one is empty prev2==nullptr and curr1 != nullptr 
@@ -1456,7 +1458,8 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 			curr2 = curr2->next;
 		}
 		if (prev1 == nullptr && curr2 != nullptr || curr2 != nullptr && curr1 == nullptr) {
-			try {
+			try {//if push_back goes wrong dealloc everything that
+			//we might have allocated and return
 				while (curr2 != nullptr) {
 					if (!push_back(curr2->data)) {
 						clear();
@@ -1464,13 +1467,14 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 					}
 					curr2 = curr2->next;
 				}
-			}
+			}//clear everything that we might have pushed so far
 			catch(...){
 				clear();
 			}
 			return *this;
 		}
 		if (prev2 == nullptr && curr1 != nullptr) {
+			//the other is empty clear everything
 			clear();
 			return *this;
 		}
