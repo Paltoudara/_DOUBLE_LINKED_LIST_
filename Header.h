@@ -85,6 +85,7 @@ private:
 	//Also one last thing, when the iterator is nullptr all the operations 
 	// supported will not work if you call them for this iterator
 	//because its nullptr now assign it to point to a valid node
+	template<int value>
 	class list_node_iterator final {
 	private:
 		list_node* ptr;
@@ -99,23 +100,40 @@ private:
 		{
 		}
 		//
-		list_node_iterator(const list_node_iterator& other)noexcept = default;
+		list_node_iterator(const list_node_iterator<value>& other)noexcept = default;
 		//
-		list_node_iterator(list_node_iterator&& other)noexcept = default;
+		list_node_iterator(list_node_iterator<value>&& other)noexcept = default;
 		//
-		list_node_iterator operator++()noexcept {
-			if (ptr != nullptr) {
-				ptr = ptr->next;
+		list_node_iterator<value> operator++()noexcept {
+			if constexpr (value == 1||value==2) {
+				if (ptr != nullptr) {
+					ptr = ptr->next;
+				}
+				return list_node_iterator<value>{ ptr };
 			}
-			return list_node_iterator{ ptr };
+			else {
+				if (ptr != nullptr) {
+					ptr = ptr->prev;
+				}
+				return list_node_iterator<value>{ptr};
+			}
 		}
 		//
-		list_node_iterator operator++(int)noexcept {
-			list_node_iterator tmp{ ptr };
-			if (ptr != nullptr) {
-				ptr = ptr->next;
+		list_node_iterator<value> operator++(int)noexcept {
+			if constexpr (value == 1 || value == 2) {
+				list_node_iterator<value> tmp{ ptr };
+				if (ptr != nullptr) {
+					ptr = ptr->next;
+				}
+				return tmp;
 			}
-			return tmp;
+			else {
+				list_node_iterator<value>tmp{ ptr };
+				if (ptr != nullptr) {
+					ptr = ptr->prev;
+				}
+				return tmp;
+			}
 		}
 		//
 		bool operator!=(const list_node_iterator& other)const noexcept {
@@ -133,6 +151,7 @@ private:
 			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
 		}
 		//
+		template<typename=std::enable_if_t<(value==1)||(value==3)>>
 		_Ty& operator *()& {
 			if (ptr != nullptr) {
 				return ptr->data;
@@ -147,6 +166,7 @@ private:
 			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
 		}
 		//
+		template<typename = std::enable_if_t<(value == 1) || (value == 3)>>
 		_Ty&& operator *()&& {
 			if (ptr != nullptr) {
 				return std::move(ptr->data);
@@ -154,12 +174,21 @@ private:
 			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
 		}
 		//
-		list_node_iterator operator +=(std::size_t counter)noexcept {
-			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr = ptr->next;
-				else break;
+		list_node_iterator<value> operator +=(std::size_t counter)noexcept {
+			if constexpr (value == 1 || value == 2) {
+				for (std::size_t i = 0; i < counter; i++) {
+					if (ptr != nullptr)ptr = ptr->next;
+					else break;
+				}
+				return list_node_iterator<value>{ ptr };
 			}
-			return list_node_iterator{ ptr };
+			else {
+				for (std::size_t i = 0; i < counter; i++) {
+					if (ptr != nullptr)ptr = ptr->prev;
+					else break;
+				}
+				return list_node_iterator<value>{ptr};
+			}
 		}
 		//
 		const _Ty* operator ->()const& {
@@ -169,6 +198,7 @@ private:
 			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
 		}
 		//
+		template<typename = std::enable_if_t<(value == 1) || (value == 3)>>
 		_Ty* operator ->()& {
 			if (ptr != nullptr) {
 				return std::addressof(ptr->data);
@@ -183,6 +213,7 @@ private:
 			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
 		}
 		//
+		template<typename = std::enable_if_t<(value == 1) || (value == 3)>>
 		_Ty* operator ->()&& {
 			if (ptr != nullptr) {
 				return std::addressof(ptr->data);
@@ -190,57 +221,103 @@ private:
 			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
 		}
 		//
-		list_node_iterator operator +(std::size_t counter)const noexcept {
-			list_node* curr{ ptr };
-			for (std::size_t i = 0; i < counter; i++) {
-				if (curr != nullptr)curr = curr->next;
-				else break;
+		list_node_iterator<value> operator +(std::size_t counter)const noexcept {
+			if constexpr (value == 1 || value == 2) {
+				list_node* curr{ ptr };
+				for (std::size_t i = 0; i < counter; i++) {
+					if (curr != nullptr)curr = curr->next;
+					else break;
+				}
+				return list_node_iterator<value>{ curr };
 			}
-			return list_node_iterator{ curr };
+			else {
+				list_node* curr{ ptr };
+				for (std::size_t i = 0; i < counter; i++) {
+					if (curr != nullptr)curr = curr->prev;
+					else break;
+				}
+				return list_node_iterator<value>{ curr };
+			}
 		}
-		friend list_node_iterator operator +(std::size_t counter, const
-			list_node_iterator& it) noexcept {
+		friend list_node_iterator<value> operator +(std::size_t counter, const
+			list_node_iterator<value>& it) noexcept {
 			return it + counter;
 		}
 		//
-		list_node_iterator operator --()noexcept {
-			if (ptr != nullptr) {
-				ptr = ptr->prev;
+		list_node_iterator<value> operator --()noexcept {
+			if constexpr (value == 1 || value == 2) {
+				if (ptr != nullptr) {
+					ptr = ptr->prev;
+				}
+				return list_node_iterator<value>{ ptr };
 			}
-			return list_node_iterator{ ptr };
+			else {
+				if (ptr != nullptr) {
+					ptr = ptr->next;
+				}
+				return list_node_iterator<value>{ptr};
+			}
 		}
 		//
-		list_node_iterator operator--(int)noexcept {
-			list_node_iterator tmp{ ptr };
-			if (ptr != nullptr) {
-				ptr = ptr->prev;
+		list_node_iterator<value> operator--(int)noexcept {
+			if constexpr (value == 1 || value == 2) {
+				list_node_iterator<value> tmp{ ptr };
+				if (ptr != nullptr) {
+					ptr = ptr->prev;
+				}
+				return tmp;
 			}
-			return tmp;
+			else {
+				list_node_iterator<value> tmp{ ptr };
+				if (ptr != nullptr) {
+					ptr = ptr->next;
+				}
+				return tmp;
+			}
 		}
 		//
-		list_node_iterator operator-(std::size_t counter)const noexcept {
-			list_node* curr{ ptr };
-			for (std::size_t i = 0; i < counter; i++) {
-				if (curr != nullptr)curr = curr->prev;
-				else break;
+		list_node_iterator<value> operator-(std::size_t counter)const noexcept {
+			if constexpr (value == 1 || value == 2) {
+				list_node* curr{ ptr };
+				for (std::size_t i = 0; i < counter; i++) {
+					if (curr != nullptr)curr = curr->prev;
+					else break;
+				}
+				return list_node_iterator<value>{ curr };
 			}
-			return list_node_iterator{ curr };
+			else {
+				list_node* curr{ ptr };
+				for (std::size_t i = 0; i < counter; i++) {
+					if (curr != nullptr)curr = curr->next;
+					else break;
+				}
+				return list_node_iterator<value>{ curr };
+			}
 		}
 		//
-		list_node_iterator operator -=(std::size_t counter)noexcept {
-			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr = ptr->prev;
-				else break;
+		list_node_iterator<value> operator -=(std::size_t counter)noexcept {
+			if constexpr (value == 1 || value == 2) {
+				for (std::size_t i = 0; i < counter; i++) {
+					if (ptr != nullptr)ptr = ptr->prev;
+					else break;
+				}
+				return list_node_iterator<value>{ ptr };
 			}
-			return list_node_iterator{ ptr };
+			else {
+				for (std::size_t i = 0; i < counter; i++) {
+					if (ptr != nullptr)ptr = ptr->next;
+					else break;
+				}
+				return list_node_iterator<value>{ ptr };
+			}
 		}
 		//
-		list_node_iterator operator =(const list_node_iterator& other)noexcept {
+		list_node_iterator<value> operator =(const list_node_iterator<value>& other)noexcept {
 			ptr = other.ptr;
 			return *this;
 		}
 		//
-		list_node_iterator operator =(list_node_iterator&& other)noexcept {
+		list_node_iterator<value> operator =(list_node_iterator<value>&& other)noexcept {
 			ptr = other.ptr;
 			return *this;
 		}
@@ -249,591 +326,6 @@ private:
 			ptr = nullptr;
 		}
 	};
-	// This is a custom const_iterator class.
-	// It acts as a lightweight wrapper around a raw pointer to a list node.
-	// 
-	// Supported operations:
-	// - operator++       : Advances the iterator to the next node.
-	// - operator+=       : Advances the iterator forward by a given number of steps.
-	// - operator*        : Dereferences the iterator to access the node's data.
-	// - operator==/!=    : Compares two iterators for equality.
-	// - operator ->	  : Used to acess the methods of the contained object.
-	// - operator +		  : Just to return a temporary iterator to a position forward.
-	// - operator -		  : Just to return a temporary iterator to a position backward.
-	// - operator --      : Advances the iterator to the previous node.
-	// - operator -=	  : Advances the iterator backward by a given number of steps.
-	// - Reference qualifiers are applied where appropriate.
-	// 
-	// ATTENTION:
-	// This iterator does not track validity. If it becomes invalidated 
-	// (e.g., due to node removal), it is your responsibility to ensure it 
-	// is not used in that state. Use the iterator only when you are certain 
-	// it points to a valid node or is `nullptr`. 
-	// ,pretty much all that matters is where the pointer
-	//shows and remember this iterator is only to get the element not to change it 
-	//Also one last thing, when the iterator is nullptr all the operations 
-	// supported will not work if you call them for this iterator
-	//because its nullptr now assign it to point to a valid node
-	class list_node_const_iterator final {
-	private:
-		list_node* ptr;
-		friend double_linked_list<_Ty>;
-	public:
-		//
-		list_node_const_iterator()noexcept :ptr{}
-		{
-		}
-		//
-		list_node_const_iterator(list_node* ptr1)noexcept :ptr{ ptr1 }
-		{
-		}
-		//
-		list_node_const_iterator(const list_node_const_iterator& other)noexcept = default;
-		//
-		list_node_const_iterator(list_node_const_iterator&& other)noexcept = default;
-		//
-		list_node_const_iterator operator++()noexcept {
-			if (ptr != nullptr) {
-				ptr = ptr->next;
-			}
-			return list_node_const_iterator{ ptr };
-		}
-		//
-		list_node_const_iterator operator++(int)noexcept {
-			list_node_const_iterator tmp{ ptr };
-			if (ptr != nullptr) {
-				ptr = ptr->next;
-			}
-			return tmp;
-		}
-		//
-		bool operator!=(const list_node_const_iterator& other)const noexcept {
-			return ptr != other.ptr;
-		}
-		//
-		bool operator ==(const list_node_const_iterator& other)const noexcept {
-			return ptr == other.ptr;
-		}
-		//
-		const _Ty& operator *()const& {
-			if (ptr != nullptr) {
-				return ptr->data;
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		const _Ty&& operator *()const&& {
-			if (ptr != nullptr) {
-				return std::move(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		list_node_const_iterator operator +=(std::size_t counter)noexcept {
-			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr = ptr->next;
-				else break;
-			}
-			return list_node_const_iterator{ ptr };
-		}
-		//
-		const _Ty* operator ->()const& {
-			if (ptr != nullptr) {
-				return std::addressof(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		const _Ty* operator ->()const&& {
-			if (ptr != nullptr) {
-				return std::addressof(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		//
-		list_node_const_iterator operator +(std::size_t counter)const noexcept {
-			list_node* curr{ ptr };
-			for (std::size_t i = 0; i < counter; i++) {
-				if (curr != nullptr)curr = curr->next;
-				else break;
-			}
-			return list_node_const_iterator{ curr };
-		}
-		friend list_node_const_iterator operator +(std::size_t counter, const
-			list_node_const_iterator& it) noexcept {
-			return it + counter;
-		}
-		//
-		list_node_const_iterator operator --()noexcept {
-			if (ptr != nullptr) {
-				ptr = ptr->prev;
-			}
-			return list_node_const_iterator{ ptr };
-		}
-		//
-		list_node_const_iterator operator--(int)noexcept {
-			list_node_const_iterator tmp{ ptr };
-			if (ptr != nullptr) {
-				ptr = ptr->prev;
-			}
-			return tmp;
-		}
-		//
-		list_node_const_iterator operator-(std::size_t counter)const noexcept {
-			list_node* curr{ ptr };
-			for (std::size_t i = 0; i < counter; i++) {
-				if (curr != nullptr)curr = curr->prev;
-				else break;
-			}
-			return list_node_const_iterator{ curr };
-		}
-		//
-		list_node_const_iterator operator -=(std::size_t counter)noexcept {
-			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr = ptr->prev;
-				else break;
-			}
-			return list_node_const_iterator{ ptr };
-		}
-		//
-		list_node_const_iterator operator =(const list_node_const_iterator& other)noexcept {
-			ptr = other.ptr;
-			return *this;
-		}
-		//
-		list_node_const_iterator operator =(list_node_const_iterator&& other)noexcept {
-			ptr = other.ptr;
-			return *this;
-		}
-		//
-		~list_node_const_iterator()noexcept {
-			ptr = nullptr;
-		}
-	};
-	// This is a custom reverse_iterator class.
-	// It acts as a lightweight wrapper around a raw pointer to a list node.
-	// 
-	// Supported operations:
-	// - operator++       : Advances the iterator to the previous node.
-	// - operator+=       : Advances the iterator backward by a given number of steps.
-	// - operator*        : Dereferences the iterator to access the node's data.
-	// - operator==/!=    : Compares two iterators for equality.
-	// - operator ->	  : Used to acess the methods of the contained object.
-	// - operator +		  : Just to return a temporary iterator to a position backward.
-	// - operator -		  : Just to return a temporary iterator to a position forward.
-	// - operator --      : Advances the iterator to the next node.
-	// - operator -=	  : Advances the iterator forward by a given number of steps.
-	// - Reference qualifiers are applied where appropriate.
-	// 
-	// ATTENTION:
-	// This iterator does not track validity. If it becomes invalidated 
-	// (e.g., due to node removal), it is your responsibility to ensure it 
-	// is not used in that state. Use the iterator only when you are certain 
-	// it points to a valid node or is `nullptr`. 
-	// ,pretty much all that matters is where the pointer
-	//shows and remember this iterator is only to get the element and change it also
-	//Also one last thing, when the iterator is nullptr all the operations 
-	// supported will not work if you call them for this iterator
-	//because its nullptr, now assign it to point to a valid node
-	class list_node_reverse_iterator final {
-	private:
-		list_node* ptr;
-		friend double_linked_list<_Ty>;
-	public:
-		//
-		list_node_reverse_iterator()noexcept :ptr{} {}
-		//
-		list_node_reverse_iterator(list_node* ptr1)noexcept :ptr{ ptr1 } {}
-		//
-		list_node_reverse_iterator(const list_node_reverse_iterator& other)noexcept = default;
-		//
-		list_node_reverse_iterator(list_node_reverse_iterator&& other)noexcept = default;
-		//
-		list_node_reverse_iterator operator++()noexcept {
-			if (ptr != nullptr) {
-				ptr = ptr->prev;
-			}
-			return list_node_reverse_iterator{ ptr };
-		}
-		//
-		list_node_reverse_iterator operator++(int)noexcept {
-			list_node_reverse_iterator tmp{ ptr };
-			if (ptr != nullptr) {
-				ptr = ptr->prev;
-			}
-			return tmp;
-		}
-		//
-		bool operator !=(const list_node_reverse_iterator& other)const noexcept {
-			return ptr != other.ptr;
-		}
-		//
-		bool operator ==(const list_node_reverse_iterator& other)const noexcept {
-			return ptr == other.ptr;
-		}
-		//
-		const _Ty& operator *()const& {
-			if (ptr != nullptr) {
-				return ptr->data;
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		_Ty& operator *()& {
-			if (ptr != nullptr) {
-				return ptr->data;
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		const _Ty&& operator *()const&& {
-			if (ptr != nullptr) {
-				return std::move(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		_Ty&& operator *()&& {
-			if (ptr != nullptr) {
-				return std::move(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		list_node_reverse_iterator operator+=(std::size_t counter)noexcept {
-			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr = ptr->prev;
-				else break;
-			}
-			return list_node_reverse_iterator{ ptr };
-		}
-		//
-		const _Ty* operator ->()const& {
-			if (ptr != nullptr) {
-				return std::addressof(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		_Ty* operator ->()& {
-			if (ptr != nullptr) {
-				return std::addressof(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		const _Ty* operator ->()const&& {
-			if (ptr != nullptr) {
-				return std::addressof(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		_Ty* operator ->()&& {
-			if (ptr != nullptr) {
-				return std::addressof(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		list_node_reverse_iterator operator +(std::size_t counter)const noexcept {
-			list_node* curr{ ptr };
-			for (std::size_t i = 0; i < counter; i++) {
-				if (curr != nullptr)curr = curr->prev;
-				else break;
-			}
-			return list_node_reverse_iterator{ curr };
-		}
-		//
-		friend list_node_reverse_iterator operator+(std::size_t counter, const
-			list_node_reverse_iterator& it)noexcept {
-			return it + counter;
-		}
-		//
-		list_node_reverse_iterator operator --()noexcept {
-			if (ptr != nullptr) {
-				ptr = ptr->next;
-			}
-			return list_node_reverse_iterator{ ptr };
-		}
-		//
-		list_node_reverse_iterator operator--(int)noexcept {
-			list_node_reverse_iterator tmp{ ptr };
-			if (ptr != nullptr) {
-				ptr = ptr->next;
-			}
-			return tmp;
-		}
-		//
-		list_node_reverse_iterator operator-(std::size_t counter)const noexcept {
-			list_node* curr{ ptr };
-			for (std::size_t i = 0; i < counter; i++) {
-				if (curr != nullptr)curr = curr->next;
-				else break;
-			}
-			return list_node_reverse_iterator{ curr };
-		}
-		//
-		list_node_reverse_iterator operator -=(std::size_t counter)noexcept {
-			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr = ptr->next;
-				else break;
-			}
-			return list_node_reverse_iterator{ ptr };
-		}
-		//
-		list_node_reverse_iterator operator =(const list_node_reverse_iterator& other)noexcept {
-			ptr = other.ptr;
-			return *this;
-		}
-		//
-		list_node_reverse_iterator operator =(list_node_reverse_iterator&& other)noexcept {
-			ptr = other.ptr;
-			return *this;
-		}
-		//
-		~list_node_reverse_iterator()noexcept {
-			ptr = nullptr;
-		}
-	};
-	// This is a custom const_reverse_iterator class.
-	// It acts as a lightweight wrapper around a raw pointer to a list node.
-	// 
-	// Supported operations:
-	// - operator++       : Advances the iterator to the previous node.
-	// - operator+=       : Advances the iterator backward by a given number of steps.
-	// - operator*        : Dereferences the iterator to access the node's data.
-	// - operator==/!=    : Compares two iterators for equality.
-	// - operator ->	  : Used to acess the methods of the contained object.
-	// - operator +		  : Just to return a temporary iterator to a position backward.
-	// - operator -		  : Just to return a temporary iterator to a position forward.
-	// - operator --      : Advances the iterator to the next node.
-	// - operator -=	  : Advances the iterator forward by a given number of steps.
-	// - Reference qualifiers are applied where appropriate.
-	// 
-	// ATTENTION:
-	// This iterator does not track validity. If it becomes invalidated 
-	// (e.g., due to node removal), it is your responsibility to ensure it 
-	// is not used in that state. Use the iterator only when you are certain 
-	// it points to a valid node or is `nullptr`. 
-	// ,pretty much all that matters is where the pointer
-	//shows and remember this iterator is only to get the element and not to change it 
-	//Also one last thing, when the iterator is nullptr all the operations 
-	// supported will not work if you call them for this iterator
-	//because its nullptr now assign it to point to a valid node
-	class list_node_const_reverse_iterator final {
-	private:
-		list_node* ptr;
-		friend double_linked_list<_Ty>;
-	public:
-		//
-		list_node_const_reverse_iterator()noexcept :ptr{} {}
-		//
-		list_node_const_reverse_iterator(list_node* ptr1)noexcept :ptr{ ptr1 } {}
-		//
-		list_node_const_reverse_iterator(const list_node_const_reverse_iterator& other)noexcept = default;
-		//
-		list_node_const_reverse_iterator(list_node_const_reverse_iterator&& other)noexcept = default;
-		//
-		list_node_const_reverse_iterator operator++()noexcept {
-			if (ptr != nullptr) {
-				ptr = ptr->prev;
-			}
-			return list_node_const_reverse_iterator{ ptr };
-		}
-		//
-		list_node_const_reverse_iterator operator++(int)noexcept {
-			list_node_const_reverse_iterator tmp{ ptr };
-			if (ptr != nullptr) {
-				ptr = ptr->prev;
-			}
-			return tmp;
-		}
-		//
-		bool operator !=(const list_node_const_reverse_iterator& other)const noexcept {
-			return ptr != other.ptr;
-		}
-		//
-		bool operator ==(const list_node_const_reverse_iterator& other)const noexcept {
-			return ptr == other.ptr;
-		}
-		//
-		const _Ty& operator *()const& {
-			if (ptr != nullptr) {
-				return ptr->data;
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		const _Ty&& operator *()const&& {
-			if (ptr != nullptr) {
-				return std::move(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		list_node_const_reverse_iterator operator+=(std::size_t counter)noexcept {
-			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr = ptr->prev;
-				else break;
-			}
-			return list_node_const_reverse_iterator{ ptr };
-		}
-		//
-		const _Ty* operator ->()const& {
-			if (ptr != nullptr) {
-				return std::addressof(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		const _Ty* operator ->()const&& {
-			if (ptr != nullptr) {
-				return std::addressof(ptr->data);
-			}
-			throw tried_to_access_an_empty_iterator_{ "tried to access an empty iterator" };
-		}
-		//
-		list_node_const_reverse_iterator operator +(std::size_t counter)const noexcept {
-			list_node* curr{ ptr };
-			for (std::size_t i = 0; i < counter; i++) {
-				if (curr != nullptr)curr = curr->prev;
-				else break;
-			}
-			return list_node_const_reverse_iterator{ curr };
-		}
-		//
-		friend list_node_const_reverse_iterator operator+(std::size_t counter,
-			const list_node_const_reverse_iterator& it)noexcept {
-			return it + counter;
-		}
-		//
-		list_node_const_reverse_iterator operator --()noexcept {
-			if (ptr != nullptr) {
-				ptr = ptr->next;
-			}
-			return list_node_const_reverse_iterator{ ptr };
-		}
-		//
-		list_node_const_reverse_iterator operator--(int)noexcept {
-			list_node_const_reverse_iterator tmp{ ptr };
-			if (ptr != nullptr) {
-				ptr = ptr->next;
-			}
-			return tmp;
-		}
-		//
-		list_node_const_reverse_iterator operator-(std::size_t counter)const noexcept {
-			list_node* curr{ ptr };
-			for (std::size_t i = 0; i < counter; i++) {
-				if (curr != nullptr)curr = curr->next;
-				else break;
-			}
-			return list_node_const_reverse_iterator{ curr };
-		}
-		//
-		list_node_const_reverse_iterator operator -=(std::size_t counter)noexcept {
-			for (std::size_t i = 0; i < counter; i++) {
-				if (ptr != nullptr)ptr = ptr->next;
-				else break;
-			}
-			return list_node_const_reverse_iterator{ ptr };
-		}
-		//
-		list_node_const_reverse_iterator operator =(const list_node_const_reverse_iterator& other)noexcept {
-			ptr = other.ptr;
-			return *this;
-		}
-		//
-		list_node_const_reverse_iterator operator =(list_node_const_reverse_iterator&& other)noexcept {
-			ptr = other.ptr;
-			return *this;
-		}
-		//
-		~list_node_const_reverse_iterator()noexcept {
-			ptr = nullptr;
-		}
-	};
-	//start func done//
-	list_node_iterator start()const noexcept {
-		//start of the list 
-		return head;
-	}
-	//start func done//
-	list_node_iterator start()noexcept {
-		//start of the list 
-		return head;
-	}
-	//finish func done// 
-	list_node_iterator finish()noexcept {
-		//end of the list
-		return nullptr;
-	}
-	//finish func done// 
-	list_node_iterator finish()const noexcept {
-		//end of the list 
-		return nullptr;
-	}
-	//cstart func done// 
-	list_node_const_iterator cstart()const noexcept {
-		//start of the list 
-		return head;
-	}
-	//cstart func done// 
-	list_node_const_iterator cstart()noexcept {
-		//start of the list 
-		return head;
-	}
-	//cfinish func done// 
-	list_node_const_iterator cfinish()noexcept {
-		//end of the list
-		return nullptr;
-	}
-	//cfinish func done// 
-	list_node_const_iterator cfinish()const noexcept {
-		//end of the list 
-		return nullptr;
-	}
-	//rstart func done// 
-	list_node_reverse_iterator rstart()const noexcept {
-		//end of the list 
-		return tail;
-	}
-	//rstart func done// 
-	list_node_reverse_iterator rstart()noexcept {
-		//end of the list 
-		return tail;
-	}
-	//rfinish func done//
-	list_node_reverse_iterator rfinish()noexcept {
-		//end of the list from backwards prespective
-		return nullptr;
-	}
-	//rfinish func done// 
-	list_node_reverse_iterator rfinish()const noexcept {
-		//end of the list from backwards prespective 
-		return nullptr;
-	}
-	//crstart func done// 
-	list_node_const_reverse_iterator crstart()const noexcept {
-		//end of the list 
-		return tail;
-	}
-	//crstart func done// 
-	list_node_const_reverse_iterator crstart()noexcept {
-		//end of the list 
-		return tail;
-	}
-	//crfinish func done// 
-	list_node_const_reverse_iterator crfinish()noexcept {
-		//end of the list from backwards prespective
-		return nullptr;
-	}
-	//crfinish func done// 
-	list_node_const_reverse_iterator crfinish()const noexcept {
-		//end of the list from backwards prespective 
-		return nullptr;
-	}
 	//private members:
 	list_node* head;
 	list_node* tail;
@@ -843,10 +335,10 @@ private:
 	template<class _Valty>
 	bool push_back_node(_Valty&& _Val) {
 		//this function simply pushes a new node at the end of the list
-		//if the list is empty ptr is the only node show ptr->prev=nullptr
+		//if the list is empty ptr is the only node so ptr->prev=nullptr
 		//because tail =nullptr head=tail=ptr;count++;
 		//if the list is not empty tail->next=new node ptr->prev=tail tail=ptr count++
-		list_node* ptr{ new (std::nothrow)list_node{std::forward<_Valty>(_Val)} };
+		list_node* ptr{new (std::nothrow)list_node{std::forward<_Valty>(_Val)} };
 		if (ptr != nullptr) {
 			ptr->prev = tail;
 			if (head == nullptr) {
@@ -885,7 +377,7 @@ private:
 	}
 	//pop_front func done//
 	void pop_front_node() {
-		//this func is very simple all it does is delete the first node in the list
+		//this func is very simple all it does is to delete the first node in the list
 		//if the list is empty it throws, if it has one node
 		//then head=head->next delete ptr head=nullptr tail =nullptr and count --;
 		//if it has more than one head=head->next delete ptr head->prev=nullptr count--;
@@ -933,9 +425,9 @@ private:
 		throw pop_from_an_empty_list{ "tried to pop from an empty list" };
 	}
 	//clear func done//
-	void clear()noexcept {
+	void clear()noexcept {//this deallocates all the list 
 		//this is the destructor pretty much 
-		//every time we keep the node with ptr move the head and then delete it 
+		//every time we keep the node to delete  with ptr move the head and then delete it 
 		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be"
 			"destructible without throwing");
 		list_node* ptr{};
@@ -944,6 +436,7 @@ private:
 			head = head->next;
 			delete ptr;
 		}
+		//reset everything
 		count = 0;
 		tail = nullptr;
 	}
@@ -969,16 +462,15 @@ private:
 			head = ptr2;
 
 			ptr2 = ptr1->next;
-
-
 		}
 		return;
 	}
+	
 	//emplace_back_node func done// 
 	template<class ..._Valty>
 	bool emplace_back_node(_Valty&&..._Val) {
-		//emplace_back_node pretty much is the same with push
-		//the only difference is that we construct the data hold by list_node in place
+		//emplace_back_node pretty much is the same with push_back
+		//the only difference is that we construct the data hold by the list_node in place
 		list_node* ptr = list_node::craft(std::forward<_Valty>(_Val)...);
 		if (ptr != nullptr) {
 			ptr->prev = tail;
@@ -997,8 +489,8 @@ private:
 	//emplace_front_node func done// 
 	template<class ..._Valty>
 	bool emplace_front_node(_Valty&&..._Val) {
-		//emplace_front_node pretty much is the same with push
-		//the only difference is that we construct the data hold by list_node in place
+		//emplace_front_node pretty much is the same with push_front
+		//the only difference is that we construct the data hold by the list_node in place
 		list_node* ptr = list_node::craft(std::forward<_Valty>(_Val)...);
 		if (ptr != nullptr) {
 			ptr->next = head;
@@ -1007,7 +499,6 @@ private:
 			}
 			else {
 				head->prev = ptr;
-
 			}
 			head = ptr;
 			count++;
@@ -1016,24 +507,23 @@ private:
 		return false;
 	}
 	//insert func done// 
-	bool insert(list_node_const_iterator pos, const _Ty& data) {
+	bool insert(list_node_iterator<2> pos, const _Ty& data) {
 		//this is an insert function
 		//there are three scenarios
 		//pos==cend() or point to an empty list
 		//so don't do anything
-		// 1)pos points to a node of other list or a deallocated node so the func throws
-		//2)pos points to our list in that case we insert the element successfuly
-		if (pos == cend()) {//no valid pos no insertion
+		//if pos point to our list to a valid node then we insert the
+		//element successfully
+		if (pos.ptr == nullptr) {//no valid pos no insertion
 			return false;
 		}
 		list_node* curr{ head };
-		bool is_valid = false;
-		while (curr != nullptr) {
-			if (curr == pos.ptr)is_valid = true;//we see if the pos.ptr address is the same
+		while (curr != nullptr&&curr!=pos.ptr) {
+			//we see if the pos.ptr address is the same
 			//with the nodes of our list if it is not then it is not a valid pos 
 			curr = curr->next;
 		}
-		if (!is_valid) {
+		if (!curr) {
 			throw not_a_valid_position{ "tried to insert element at an invalid"
 								"position" };
 		}
@@ -1058,7 +548,7 @@ private:
 	}
 	//add_unique func done//
 	template<typename _Pred1>
-	bool add_unique(list_node_const_iterator pos, const _Ty& data, _Pred1 _Pred) {
+	bool add_unique(list_node_iterator<2> pos, const _Ty& data, _Pred1 _Pred) {
 		//this function pretty much uses the same tactic as the insert function above
 		//the only difference is that we check if the element is in the list 
 		//if it is not then we insert it
@@ -1066,21 +556,23 @@ private:
 		// that is used in order to compare
 		//this _Pred must be a func that can be called with two const _Ty& args 
 		//and the return type must be bool else the behavior is undefined
-		if (pos == cend()) {//no valid pos no insertion
+		//the _Pred should not throw
+		if (pos.ptr == nullptr) {//no valid pos no insertion
 			return false;
 		}
 		list_node* curr{ head };
-		bool  is_valid = false;
-		while (curr != nullptr) {
-			if (curr == pos.ptr)is_valid = true;//we see if the pos.ptr address is the same
+		while (curr != nullptr&&curr!=pos.ptr) {
+			if (_Pred(std::as_const(curr->data), std::as_const(data)))return false;
+			//we see if the pos.ptr address is the same
 			//with the nodes of our list if it is not then it is not a valid pos 
+			//at the same time we see if the list already contains this item
+			//that we are going to add
 			curr = curr->next;
 		}
-		if (!is_valid) {
+		if (!curr) {//invalid pos
 			throw not_a_valid_position{ "tried to insert element at an invalid"
 								"position" };
 		}
-		curr = head;
 		while (curr != nullptr) {
 			if (_Pred(std::as_const(curr->data), std::as_const(data)))return false;
 			curr = curr->next;
@@ -1117,11 +609,13 @@ private:
 			"destructible without throwing");
 		//the pred func should be able to be called with one const _Ty& arg
 		//and the return type of this func should be bool or else the behavior
-		//is undefined
+		//is undefined,also this func should not throw
 		//if you keep finding the element at the start delete it 
 		while (head != nullptr && _Pred(std::as_const(head->data))) {
 			pop_front();
 		}//empty or still have elements
+		//if head !=nullptr we found element that is doesn't make the pred true 
+		//or we have no elements (head==nullptr)
 		if (head != nullptr) {//still have elements if head==nullptr then zero elements
 			list_node* prev{ head };//we know that head doesn't satisfy the pred
 			list_node* curr{ head->next };//with curr and the rest of list we check
@@ -1152,12 +646,12 @@ private:
 	template<typename _Pred1>
 	void delete_duplicates(_Pred1 _Pred) {
 		//this func simply does two things
-		//it is called by two funcs one that uses the std::equal_to<>() in order
+		//it is called by two funcs one that uses the std::equal_to<>{}in order
 		//to compare elements with the operator ==
 		//and the other uses a pred to compare the elements if they are equal 
 		//the _Pred func should be able to be called with two const _Ty& args
 		//and the return type of this func should be bool or else the behavior is
-		//undefined
+		//undefined,also this func should not throw
 		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be"
 			"destructible without throwing");
 		//we pretty much have to pointers prev,curr
@@ -1199,6 +693,7 @@ private:
 		//the default value of the comparator is std::less_equal<>{}
 		//the comp func should be a func that can be called by two args const _Ty&
 		//and const _Ty& and the return type should be bool else the behavior is undefined
+		//the comparator should not throw
 		if (count < 2)return true;
 		list_node* prev{ head };
 		list_node* curr{ head->next };
@@ -1218,6 +713,7 @@ private:
 		//the default value of the comparator is std::greater_equal<>{}
 		//the comp func should be a func that can be called by two args const _Ty&
 		//and const _Ty& and the return type should be bool else the behavior is undefined
+		//the comp should also not throw
 		if (count < 2)return true;
 		list_node* prev{ head };
 		list_node* curr{ head->next };
@@ -1225,7 +721,7 @@ private:
 			prev = curr;
 			curr = curr->next;
 		}
-		if (curr != nullptr)return false;
+		if (curr != nullptr)return false;//we are not at the end so not in descending order
 		return true;
 	}
 	//is_sorted_ func done 
@@ -1238,6 +734,7 @@ private:
 		// std::greater_equal<>{}
 		//the comp funcs should be funcs that can be called by two args const _Ty&
 		//and const _Ty& and the return type should be bool else the behavior is undefined
+		//the comparator funcs should also not throw
 		if (count < 2)return true;
 		list_node* prev{ head };
 		list_node* curr{ head->next };
@@ -1272,25 +769,33 @@ private:
 		if (this == &other)return;
 		if (other.empty())return;
 		if (!is_ascending_(comp) || !other.is_ascending_(comp))return;
-		count += other.count;
+		//
 		list_node* Head{ new (std::nothrow)list_node{} };
 		if (Head == nullptr)return;
 		list_node* ptr{ Head };
 		list_node* curr1{ head };
 		list_node* curr2{ other.head };
-		while (curr1 != nullptr && curr2 != nullptr) {
-			if (comp(std::as_const(curr1->data), std::as_const(curr2->data))) {
-				ptr->next = curr1;
-				curr1->prev = ptr;
-				ptr = ptr->next;
-				curr1 = curr1->next;
+		//the comparator should not throw otherwise 
+		//the behavior is undefined
+		try {
+			while (curr1 != nullptr && curr2 != nullptr) {
+				if (comp(std::as_const(curr1->data), std::as_const(curr2->data))) {
+					ptr->next = curr1;
+					curr1->prev = ptr;
+					ptr = ptr->next;
+					curr1 = curr1->next;
+				}
+				else {
+					ptr->next = curr2;
+					curr2->prev = ptr;
+					ptr = ptr->next;
+					curr2 = curr2->next;
+				}
 			}
-			else {
-				ptr->next = curr2;
-				curr2->prev = ptr;
-				ptr = ptr->next;
-				curr2 = curr2->next;
-			}
+		}
+		catch (...) {
+			delete ptr;
+			throw 1;
 		}
 		//whatever left we just give it because we now have only onel list
 		if (curr1 == nullptr && curr2 != nullptr) {
@@ -1303,14 +808,16 @@ private:
 			curr1->prev = ptr;
 			//the tail already points where we want it to be
 		}
+		count += other.count;
 		head = Head->next;
+		head->prev = nullptr;
 		delete Head;//don't forget to delete the extra node
 		other.head = other.tail = nullptr;
 		other.count = 0;
 
 	}
 	//erase func done//
-	bool erase(list_node_const_iterator pos) {
+	bool erase(list_node_iterator<2> pos) {
 		//this is an erase function that deletes the element after the pos you gave
 		//we check if the iterator is nullptr or it points to a node
 		//note that the iterator must point to the list that called the method and 
@@ -1319,19 +826,16 @@ private:
 		//else we delete the node successfuly
 		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be"
 			"destructible without throwing");
-		if (pos == cend())return false;
+		if (pos.ptr == nullptr || pos.ptr->next == nullptr)return false;
 		list_node* curr{ head };
-		bool is_valid = false;
-		while (curr != nullptr) {
-			if (pos.ptr == curr)is_valid = true;
+		while (curr != nullptr&&curr!=pos.ptr) {
 			curr = curr->next;
 		}
-		if (!is_valid) {
+		if (!curr) {
 			throw not_a_valid_position{ "tried to insert element at an invalid"
 								 "position" };
 		}
 		count--;
-		if (pos.ptr->next == nullptr)return false;
 		list_node* ptr{ pos.ptr->next };
 		pos.ptr->next = ptr->next;
 		if (ptr->next == nullptr) {
@@ -1344,10 +848,10 @@ private:
 		return true;
 	}
 public:
-	using iterator = list_node_iterator;
-	using const_iterator = list_node_const_iterator;
-	using reverse_iterator = list_node_reverse_iterator;
-	using const_reverse_iterator = list_node_const_reverse_iterator;
+	using iterator = list_node_iterator<1>;
+	using const_iterator = list_node_iterator<2>;
+	using reverse_iterator = list_node_iterator<3>;
+	using const_reverse_iterator = list_node_iterator<4>;
 	static_assert(std::is_object_v<_Ty>, "The C++ Standard forbids container adaptors of non-object types "
 		"because of [container.requirements].");
 	static_assert(!std::is_reference_v<_Ty>, "no references allowed");
@@ -1511,68 +1015,50 @@ public:
 
 	}
 	//begin func done// 
-	iterator begin()const noexcept {
-		return start();
+	iterator begin() noexcept {
+		return head;
 	}
 	//begin func done// 
-	iterator begin()noexcept {
-		return start();
-	}
-	//end func done// 
-	iterator end()const noexcept {
-		return finish();
+	const_iterator begin()const noexcept {
+		return head;
 	}
 	//end func done// 
 	iterator end() noexcept {
-		return finish();
+		return nullptr;
+	}
+	//end func done// 
+	const_iterator end()const noexcept {
+		return nullptr;
 	}
 	//begin func done //
 	const_iterator cbegin()const noexcept {
-		return cstart();
+		return head;
 	}
-	//begin func done// 
-	const_iterator cbegin()noexcept {
-		return cstart();
-	}
-	//end func done// 
 	const_iterator cend()const noexcept {
-		return cfinish();
-	}
-	//end func done// 
-	const_iterator cend() noexcept {
-		return cfinish();
+		return nullptr;
 	}
 	//rbegin func done// 
 	reverse_iterator rbegin()noexcept {
-		return rstart();
+		return tail;
 	}
 	//rbegin func done// 
-	reverse_iterator rbegin()const noexcept {
-		return rstart();
-	}
-	//rend func done// 
-	reverse_iterator rend()const noexcept {
-		return rfinish();
+	const_reverse_iterator rbegin()const noexcept {
+		return tail;
 	}
 	//rend func done// 
 	reverse_iterator rend() noexcept {
-		return rfinish();
+		return nullptr;
 	}
-	//crbegin func done// 
-	const_reverse_iterator crbegin()noexcept {
-		return crstart();
+	//rend func done// 
+	const_reverse_iterator rend()const noexcept {
+		return nullptr;
 	}
 	//crbegin func done// 
 	const_reverse_iterator crbegin()const noexcept {
-		return crstart();
+		return tail;
 	}
-	//crend func done// 
 	const_reverse_iterator crend()const noexcept {
-		return crfinish();
-	}
-	//crend func done// 
-	const_reverse_iterator crend() noexcept {
-		return crfinish();
+		return nullptr;
 	}
 	//unsafe_insert func done// 
 	//use this func only for performance and when you 
@@ -1620,9 +1106,8 @@ public:
 		//undefined
 		static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be"
 			"destructible without throwing");
-		if (pos == cend())return false;
+		if (pos.ptr==nullptr||pos.ptr->next==nullptr)return false;
 		count--;
-		if (pos.ptr->next == nullptr)return false;
 		list_node* ptr{ pos.ptr->next };
 		pos.ptr->next = ptr->next;
 		if (ptr->next == nullptr) {
@@ -1714,14 +1199,21 @@ void double_linked_list<_Ty>::swap(double_linked_list<_Ty>& other)noexcept {
 template<typename _Ty>
 double_linked_list<_Ty>::double_linked_list(const std::initializer_list<_Ty>& other)
 	:head{}, tail{}, count{}
-{
-	const _Ty* ptr{ other.begin() };
-	for (std::size_t i = 0; i < other.size(); i++) {
-		if (!push_back(*ptr)) {
-			clear();
-			break;
+{//if the push_backs fail, give back everything allocated and return
+	//the object inm the default state
+	try {
+		const _Ty* ptr{ other.begin() };
+		for (std::size_t i = 0; i < other.size(); i++) {
+			if (!push_back(*ptr)) {
+				clear();
+				break;
+			}
+			ptr++;
 		}
-		ptr++;
+	}//if push_back throws we deallocate everything that we might have
+	//pushed
+	catch (...) {
+		clear();
 	}
 
 }
@@ -1731,15 +1223,22 @@ double_linked_list<_Ty>::double_linked_list(const double_linked_list<_Ty>& other
 	:head{}, tail{}, count{}
 {//this simply copies the contets of the other object
 	//if this==&other nothing happens
-	//if this!=&other then i other empty nothing happens
+	//if this!=&other then if other is empty nothing happens
 	//otherwise copy the contents of the other object
-	list_node* curr{ other.head };
-	while (curr != nullptr) {
-		if (!push_back(curr->data)) {
-			clear();
-			break;
+	//if the push_backs fails give back everything allocated and return 
+	try {
+		list_node* curr{ other.head };
+		while (curr != nullptr) {
+			if (!push_back(curr->data)) {
+				clear();
+				break;
+			}
+			curr = curr->next;
 		}
-		curr = curr->next;
+	}//if push_back throws we deallocate everything that we might have
+	//pushed
+	catch (...) {
+		clear();
 	}
 }
 //move constructor done//
@@ -1749,7 +1248,8 @@ double_linked_list<_Ty>::double_linked_list(double_linked_list<_Ty>&& other)noex
 {//if this==&other then swaps nullptr's and 0's no problem 
 	//if this !=&other if other is empty same as case as previous
 	//if this!=&other and other not empty simply steal his contets
-	//and giving him the default state 
+	//and giving him the default state
+	//after that operation the other is in the default state
 	std::swap(head, other.head);
 	std::swap(tail, other.tail);
 	std::swap(count, other.count);
@@ -1881,13 +1381,18 @@ operator=(const std::initializer_list<_Ty>& other)& {
 		prev2 = curr2;
 		curr2++;
 	}
-	if (prev1 == nullptr && other.size() != 0 || curr1 == nullptr && curr2 != other.end()) {
-		while (curr2 != other.end()) {
-			if (!push_back(*curr2)) {
-				clear();
-				break;
+	if (prev1 == nullptr && curr2!=other.end() || curr1 == nullptr && curr2 != other.end()) {
+		try {
+			while (curr2 != other.end()) {
+				if (!push_back(*curr2)) {
+					clear();
+					break;
+				}
+				curr2++;
 			}
-			curr2++;
+		}
+		catch (...) {
+			clear();
 		}
 		return *this;
 	}
@@ -1943,12 +1448,17 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 			curr2 = curr2->next;
 		}
 		if (prev1 == nullptr && curr2 != nullptr || curr2 != nullptr && curr1 == nullptr) {
-			while (curr2 != nullptr) {
-				if (!push_back(curr2->data)) {
-					clear();
-					break;
+			try {
+				while (curr2 != nullptr) {
+					if (!push_back(curr2->data)) {
+						clear();
+						break;
+					}
+					curr2 = curr2->next;
 				}
-				curr2 = curr2->next;
+			}
+			catch(...){
+				clear();
 			}
 			return *this;
 		}
