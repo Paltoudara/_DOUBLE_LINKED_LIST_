@@ -10,6 +10,9 @@
 #include"Macros.h"
 #include<functional>
 _PANAGIOTIS_BEGIN
+//-----------------------
+//		INTERFACE BEGIN
+//-----------------------
 template<typename _Ty>
 class double_linked_list final {
 private:
@@ -60,31 +63,8 @@ private:
 
 		}
 	};
-	// This is a custom iterator class.
-	// It acts as a lightweight wrapper around a raw pointer to a list node.
-	// 
-	// Supported operations:
-	// - operator++       : Advances the iterator to the next node.
-	// - operator+=       : Advances the iterator forward by a given number of steps.
-	// - operator*        : Dereferences the iterator to access the node's data.
-	// - operator==/!=    : Compares two iterators for equality.
-	// - operator ->	  : Used to acess the methods of the contained object.
-	// - operator +		  : Just to return a temporary iterator to a position forward.
-	// - operator -		  : Just to return a temporary iterator to a position backward.
-	// - operator --      : Advances the iterator to the previous node.
-	// - operator -=	  : Advances the iterator backward by a given number of steps.
-	// - Reference qualifiers are applied where appropriate.
-	// 
-	// ATTENTION:
-	// This iterator does not track validity. If it becomes invalidated 
-	// (e.g., due to node removal), it is your responsibility to ensure it 
-	// is not used in that state. Use the iterator only when you are certain 
-	// it points to a valid node or is `nullptr`. 
-	// ,pretty much all that matters is where the pointer
-	//shows and remember this iterator is only to get the element and change it also
-	//Also one last thing, when the iterator is nullptr all the operations 
-	// supported will not work if you call them for this iterator
-	//because its nullptr now assign it to point to a valid node
+	//custom iterator class,it handles iterator,const_iterator,
+	//reverse_iterator,const_reverse_iterator
 	template<int value>
 	class list_node_iterator final {
 	private:
@@ -239,6 +219,7 @@ private:
 				return list_node_iterator<value>{ curr };
 			}
 		}
+		//
 		friend list_node_iterator<value> operator +(std::size_t counter, const
 			list_node_iterator<value>& it) noexcept {
 			return it + counter;
@@ -331,7 +312,7 @@ private:
 	list_node* tail;
 	std::size_t count;
 	//
-	//push_back_node func done// 
+	//push_back_node func done//
 	template<class _Valty>
 	bool push_back_node(_Valty&& _Val) {
 		//this function simply pushes a new node at the end of the list
@@ -507,14 +488,16 @@ private:
 		return false;
 	}
 	//insert func done// 
-	bool insert(list_node_iterator<2> pos, const _Ty& data) {
+	bool insert(list_node_iterator<2> pos, const _Ty& data) 
+	{
 		//this is an insert function
 		//there are three scenarios
 		//pos==cend() or point to an empty list
 		//so don't do anything
-		//if pos point to our list to a valid node then we insert the
+		//1)if pos is invalid we throw exception
+		//2)if pos point to our list to a valid node then we insert the
 		//element successfully
-		if (pos.ptr == nullptr) {//no valid pos no insertion
+		if (pos.ptr== nullptr) {//no valid pos no insertion
 			return false;
 		}
 		list_node* curr{ head };
@@ -557,9 +540,7 @@ private:
 		//this _Pred must be a func that can be called with two const _Ty& args 
 		//and the return type must be bool else the behavior is undefined
 		//the _Pred should not throw
-		if (pos.ptr == nullptr) {//no valid pos no insertion
-			return false;
-		}
+		if (pos.ptr == nullptr)return false;//no valid pos no insertion
 		list_node* curr{ head };
 		while (curr != nullptr&&curr!=pos.ptr) {
 			if (_Pred(std::as_const(curr->data), std::as_const(data)))return false;
@@ -762,7 +743,7 @@ private:
 		//we create a new dummy list and we grow it with our elements
 		//when the progress ends the other list points to nothing while this
 		//point to the new list the node call Head is to make the code a little bit 
-		//easier ,we take its elements from the lists and we compare ,the minimum goes first
+		//easier ,we take the elements from the lists and we compare ,the minimum goes first
 		//then we advnace and then the next minimum beetween the two lists and then the next
 		//the comp func should be a func that can be called by two args const _Ty&
 		//and const _Ty& and the return type should be bool else the behavior is undefined
@@ -775,8 +756,7 @@ private:
 		list_node* ptr{ Head };
 		list_node* curr1{ head };
 		list_node* curr2{ other.head };
-		//the comparator should not throw otherwise 
-		//the behavior is undefined
+		//the comparator must not throw otherwise 
 		try {
 			while (curr1 != nullptr && curr2 != nullptr) {
 				if (comp(std::as_const(curr1->data), std::as_const(curr2->data))) {
@@ -795,7 +775,7 @@ private:
 		}
 		catch (...) {
 			delete ptr;
-			throw 1;
+			std::abort();
 		}
 		//whatever left we just give it because we now have only onel list
 		if (curr1 == nullptr && curr2 != nullptr) {
@@ -1120,6 +1100,16 @@ public:
 		return true;
 	}
 };
+
+//-----------------------
+//		INTERFACE END
+//-----------------------
+
+
+//-----------------------
+//		IMPLEMENTATION BEGIN
+//-----------------------
+
 //default constructor done//
 template<typename _Ty>
 double_linked_list<_Ty>::double_linked_list()noexcept
@@ -1367,11 +1357,11 @@ operator=(const std::initializer_list<_Ty>& other)& {
 	//and curr2==other.end() show we go in the last if 
 	//if size<other.size we have to allocate some new nodes so
 	//curr1==nullptr and curr2!=other.end() show we go to the first if 
-	list_node* prev1{ nullptr };
-	list_node* curr1{ head };
 	static_assert(std::is_copy_assignable_v<_Ty>, "you must be able to do this:"
 		"curr1->data=*curr2");
 	static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be destructible without throwing");
+	list_node* prev1{ nullptr };
+	list_node* curr1{ head };
 	const _Ty* prev2{ nullptr };
 	const _Ty* curr2{ other.begin() };
 	while (curr1 != nullptr && curr2 != other.end()) {
@@ -1435,7 +1425,7 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 	static_assert(std::is_copy_assignable_v<_Ty>, "you must be able to make this operation"
 		"curr1->data=curr2->data");
 	static_assert(std::is_nothrow_destructible_v<_Ty>, "the type must be destructible without throwing");
-	if (this != &other) {
+	if (this == &other) { return *this; }
 		list_node* prev1{ nullptr };
 		list_node* curr1{ head };
 		list_node* prev2{ nullptr };
@@ -1477,7 +1467,7 @@ double_linked_list<_Ty>& double_linked_list<_Ty>::operator=(const
 			}
 			return *this;
 		}
-	}
+	
 	return *this;
 }
 //merge func done// 
@@ -1507,4 +1497,7 @@ template<typename _Ty>
 bool double_linked_list<_Ty>::erase_after(const_iterator pos) {
 	return erase(pos);
 }
+//-----------------------
+//		IMPLEMENTATION END
+//-----------------------
 _PANAGIOTIS_END
